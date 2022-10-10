@@ -1,8 +1,4 @@
-package IA.ProbIA5;
-
-/**
- * Created by bejar on 17/01/17.
- */
+package IA.Energia;
 
 import aima.search.framework.HeuristicFunction;
 
@@ -10,6 +6,6 @@ public class ProbIA5HeuristicFunction implements HeuristicFunction {
 
     public double getHeuristicValue(Object n){
 
-        return ((ProbIA5Board) n).heuristic();
+        return 0.1;
     }
 }

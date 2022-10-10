@@ -1,5 +1,5 @@
 
-import IA.ProbIA5.*;
+import IA.Energia.*;
 import aima.search.framework.GraphSearch;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
@@ -12,8 +12,6 @@ import java.util.Properties;
 
 
 public class Main {
-
-    Centrales c;
 
     public static void main(String[] args) throws Exception{
         /**

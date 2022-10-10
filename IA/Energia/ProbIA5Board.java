@@ -1,4 +1,4 @@
-package IA.ProbIA5;
+package IA.Energia;
 
 /**
  * Created by bejar on 17/01/17.
