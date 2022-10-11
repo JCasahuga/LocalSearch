@@ -9,14 +9,14 @@ public class ProbIA5SuccesorFunction implements SuccessorFunction{
 
     public List getSuccessors(Object state){
         ArrayList retval = new ArrayList();
-        ProbIA5Board board = (ProbIA5Board) state;
+        Network network = (Network) state;
 	
 	int totalClients = 0;
 	int totalCentrals = 0;
 	
 	for (int i = 0; i < totalClients; ++i) {
 		for (int j = 0; j < totalCentrals; ++j) {
-		    ProbIA5Board new_state = new ProbIA5Board(board.getConfiguraration(), board.getSolution());
+		    Network new_state = new Network(network.getConfiguraration(), network.getSolution());
 		    new_state.mouClient(i, j);
 		    retval.add(new Successor(s, new_state));
 		}
@@ -24,7 +24,7 @@ public class ProbIA5SuccesorFunction implements SuccessorFunction{
 	
 	for (int i = 0; i < totalClients; ++i) {
 		for (int j = 0; j < totalClients; ++j) {
-		    ProbIA5Board new_state = new ProbIA5Board(board.getConfiguraration(), board.getSolution());
+		    Network new_state = new Network(network.getConfiguraration(), network.getSolution());
 		    new_state.swapClient(i, j);
 		    retval.add(new Successor(s, new_state));
 		}

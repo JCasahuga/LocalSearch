@@ -13,7 +13,7 @@ public class Network {
     private static int [] solution;
 
     /* Constructor */
-    public Network(int []init, int[] goal) {
+    public ProbIA5Board(int []init, int[] goal) {
 
         board = new int[init.length];
         solution = new int[init.length];
