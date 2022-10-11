@@ -26,8 +26,14 @@ public class ProbIA5Board {
     }
 
     /* vvvvv TO COMPLETE vvvvv */
-    public void flip_it(int i){
-        // flip the coins i and i + 1
+    public void mouClient(int i, int j){
+        // mou client i a central j
+                
+    }
+    
+    public void swapClient(int i, int j){
+        // swap client i amb client j
+                
     }
 
     /* Heuristic function */
@@ -35,12 +41,6 @@ public class ProbIA5Board {
         // compute the number of coins out of place respect to solution
         return 0;
     }
-
-     /* Goal test */
-     public boolean is_goal(){
-         // compute if board = solution
-         return false;
-     }
 
      /* auxiliary functions */
 
