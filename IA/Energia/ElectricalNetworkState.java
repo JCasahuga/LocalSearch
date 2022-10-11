@@ -10,7 +10,8 @@ public class ElectricalNetworkState {
     private Clientes clients;
     private Centrales centrals;
 
-    private int[] assignacioClients; 
+    private int[] assignedClients; 
+    private int[] leftPowerCentral;
 
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
@@ -19,6 +20,8 @@ public class ElectricalNetworkState {
         this.clients = clients;
         this.centrals = centrals;
 
+        assignedClients = new int[clients.size()];
+        leftPowerCentral = new int[centrals.size()];
     }
 
     //  ---------------------- Initial states generation --------------
@@ -35,7 +38,7 @@ public class ElectricalNetworkState {
     }
 
     private void generateInitialSolution0() {
-        for
+        
     }
 
     private void generateInitialSolution1() {}
@@ -61,5 +64,16 @@ public class ElectricalNetworkState {
 
     private int getOccupationDistribution() {
         return 0;
+    }
+
+    ///////////////////////////////////////////////////////
+    public void mouClient(int i, int j){
+        // mou client i a central j
+                
+    }
+    
+    public void swapClient(int i, int j){
+        // swap client i amb client j
+                
     }
 }

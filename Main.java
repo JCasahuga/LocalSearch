@@ -5,6 +5,7 @@ import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.AStarSearch;
+import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
@@ -50,7 +51,7 @@ public class Main {
                     // TODO: Executar segons params
 					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
 					networkState.generateInitialSolution(generationMethod);
-					run(networkState, )
+					run(networkState, algorithm, heuristic);
 
     				break;
     				
@@ -150,7 +151,7 @@ public class Main {
 
     // -------------------- Run model methods ---------------------------
 
-    private boolean run(ElectricalNetworkState networkstate, int algorithm, int heuristic) {
+    private static boolean run(ElectricalNetworkState networkstate, int algorithm, int heuristic) {
         boolean error = false;
         
         if      (algorithm == 0 &&  heuristic == 0)	error = ElectricalNetwork_HillClimbing_Benefici(networkstate);
@@ -159,13 +160,13 @@ public class Main {
         return error;
     }
 
-	private boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
+	private static boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
         System.out.println ("Solution using Hill Climbing + Benefici: ");
 		try {
 			networkState.printState(false, 0);
 			long time = System.currentTimeMillis();
 			
-			Problem problem = new Problem (state, new ElectricalNetworkSuccessorFunction1(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction1());
+			Problem problem = new Problem (networkState, new ElectricalNetworkSuccessorFunction1(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction1());
 			Search search = new HillClimbingSearch();
 			SearchAgent agent = new SearchAgent (problem, search);
 			
@@ -180,6 +181,6 @@ public class Main {
 		}
     }
 
-    private boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {return false;}
+    private static boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {return false;}
 
 }
