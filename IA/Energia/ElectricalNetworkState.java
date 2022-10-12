@@ -24,6 +24,15 @@ public class ElectricalNetworkState {
         leftPowerCentral = new int[centrals.size()];
     }
 
+    public ElectricalNetworkState(ElectricalNetworkState networkState) {
+        this.clients = networkState.clients;
+        this.centrals = networkState.centrals;
+
+        assignedClients = new int[networkState.clients.size()];
+        leftPowerCentral = new int[networkState.centrals.size()];
+    }
+
+
     //  ---------------------- Initial states generation --------------
     public void generateInitialSolution(int method)
     {
@@ -75,5 +84,13 @@ public class ElectricalNetworkState {
     public void swapClient(int i, int j){
         // swap client i amb client j
                 
+    }
+
+    public Clientes getConfiguraration() {
+        return null;
+    }
+
+    public Centrales getSolution() {
+        return null;
     }
 }
