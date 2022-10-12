@@ -18,10 +18,10 @@ import java.util.Vector;
 
 public class Main {
 
-    static private int[] numberOfCentrals = new int[]{20, 20, 10};          // Centrals type A, B, C (?)
-    static private int numberOfClients = 500;                               // Number of clients
-    static private double[] typeOfClients = new double[]{20, 20, 10};       // Client type XG, MG, G (?)
-    static private double propGuaranteed = 0.8;                             // % of clients with guaranteed supply
+    static private int[] numberOfCentrals = new int[]{5, 10, 25};          // Centrals type A, B, C (?)
+    static private int numberOfClients = 1000;                               // Number of clients
+    static private double[] typeOfClients = new double[]{0.25, 0.3, 0.45};       // Client type XG, MG, G (?)
+    static private double propGuaranteed = 0.75;                             // % of clients with guaranteed supply
     static private int algorithm = 0;                                       // (0) - Hill Climbling, (1) - Simulated Annealing
     static private int generationMethod = 0;                                // (0) - , (1) - , (2) - ...
     static private int heuristic = 0;                                       // (0) - ,...
