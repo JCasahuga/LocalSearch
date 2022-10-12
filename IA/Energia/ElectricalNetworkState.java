@@ -13,12 +13,15 @@ public class ElectricalNetworkState {
     private int[] assignedClients; 
     private int[] leftPowerCentral;
 
+    private int benefici;
+
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
 
     public ElectricalNetworkState(Clientes clients, Centrales centrals) {
         this.clients = clients;
         this.centrals = centrals;
+        this.benefici = 0;
     }
 
     public ElectricalNetworkState(ElectricalNetworkState networkState) {
@@ -27,6 +30,7 @@ public class ElectricalNetworkState {
 
         this.assignedClients = networkState.assignedClients;
         this.leftPowerCentral = networkState.leftPowerCentral;
+        this.benefici = networkState.benefici;
     }
 
 
@@ -64,7 +68,7 @@ public class ElectricalNetworkState {
     }
     
     private int getBenefit() {
-        return 0;
+        return benefici;
     }
 
     private int getAverageDistanceToCentrals() {
@@ -92,5 +96,9 @@ public class ElectricalNetworkState {
 
     public int getCentralsNumber() {
         return centrals.size();
+    }
+
+    public int heuristic(){
+        return benefici;
     }
 }
