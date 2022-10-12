@@ -141,7 +141,7 @@ public class Main {
         System.out.println ("typeclient <XG> <MG> <G> -- change client types");
         System.out.println ("gclient <N>              -- change % of clients with guaranteed supply ");
 		System.out.println ("algo <I>                 -- change search algorithm ([0]- Hill climbing, [1]- Simulated annealing)");
-		System.out.println ("genmethod <I>            -- change generation method ([0]- , [1]- )");
+		System.out.println ("genmethod <I>            -- change generation method ([0]- Closest, [1]- )");
 		System.out.println ("heur <I>                 -- change heuristic ([0]- , [1]- )");
 		System.out.println ("seed <I>                 -- change the seed");
 		System.out.println ("print                    -- see current values");

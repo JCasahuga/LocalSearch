@@ -11,6 +11,10 @@ import IA.Energia.*;
 import aima.datastructures.PriorityQueue;
 
 public class ElectricalNetworkState {
+
+    // Constants
+    public static final int GARANTIZADO = 0;
+
     // Atributtes
     private Clientes clients;
     private Centrales centrals;
@@ -47,7 +51,7 @@ public class ElectricalNetworkState {
 
         switch(method) {
             case 0:
-                generateInitialSolution0();
+                generateInitialSolutionClosest();
                 break;
             case 1:
                 generateInitialSolution1();
@@ -55,7 +59,7 @@ public class ElectricalNetworkState {
         }
     }
 
-    private void generateInitialSolution0() {
+    private void generateInitialSolutionClosest() {
         int tClients = getClientsNumber();
         int tCentrals = getCentralsNumber();
 
@@ -85,12 +89,12 @@ public class ElectricalNetworkState {
             double minConsumption = 10000;
             for (int j = 0; j < tCentrals; ++j) {
                 Central ce = centrals.get(j);
-                double d = getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
-                double consumption = getConsumption(cl, ce);
-                if (consumption <= leftPowerCentral[j] && d < minDistance) {
+                double d = getDistance(cl, ce);
+
+                if (getConsumption(cl, ce) <= leftPowerCentral[j] && d < minDistance) {
                     minDistance = d;
                     closest = j;
-                    minConsumption = consumption;
+                    minConsumption = getConsumption(cl, ce);
                 }
             }
             if (closest != -1)  {
@@ -115,10 +119,12 @@ public class ElectricalNetworkState {
         return Math.sqrt(distX*distX + distY*distY);
     }
 
+    private double getDistance(int cl, int ce) {
+        return getDistance(getClient(cl), getCentral(ce));
+    }
+
     private double getDistance(Cliente cl, Central ce) {
-        int distX = cl.getCoordX() - ce.getCoordX();
-        int distY = cl.getCoordY() - ce.getCoordY();
-        return Math.sqrt(distX*distX + distY*distY);
+        return getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
     }
 
     private void generateInitialSolution1() {}
@@ -127,6 +133,8 @@ public class ElectricalNetworkState {
     // ------------------------ Funcions auxiliars ---------------------
     public void printState(boolean finalState, double time)
     {
+        if (!finalState)System.out.println ("------- Starting generated solution: "); 
+        else            System.out.println ("------- Final generated solution: "); 
         if (finalState) System.out.println ("Time to generate solution    " + time + " ms");
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
@@ -177,7 +185,7 @@ public class ElectricalNetworkState {
     }
 
     private boolean isGuaranteed(int client) {
-        return getContract(client) == 0;
+        return getContract(client) == GARANTIZADO;
     }
 
     private boolean centralInUse(int central) {
