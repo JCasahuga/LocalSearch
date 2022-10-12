@@ -193,6 +193,12 @@ public class ElectricalNetworkState {
         return sum/count;
     }
 
+    /** 
+        Returns a string in array looking format with 10 values each of them indicate the
+        number of centrals within a range consumption usage. 
+        F.e. 3rd value will indicate the number of centrals that are being used between 
+        30% and 40% of its capacity
+    */
     private String getOccupationDistribution() {
         //String[] occupation = new String[10];
         int[] count = new int[10];
