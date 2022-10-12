@@ -79,16 +79,7 @@ public class ElectricalNetworkState {
         return 0;
     }
 
-    ///////////////////////////////////////////////////////
-    public void mouClient(int i, int j){
-        // mou client i a central j
-                
-    }
-    
-    public void swapClient(int i, int j){
-        // swap client i amb client j
-                
-    }
+    // -------------------- Funcions redefinides auxiliars ---------------------
 
     public int getClientsNumber() {
         return clients.size();
@@ -100,5 +91,60 @@ public class ElectricalNetworkState {
 
     public int heuristic(){
         return benefici;
+    }
+
+    private Cliente getClient(int client) {
+        return clients.get(client);
+    }
+
+    private Central getCentral(int central) {
+        return clients.get(central);
+    }
+
+    private double getConsumption(int client) {
+        return getClient(client).getConsumo();
+    }
+
+    private int getContract(int client) {
+        return getClient(client).getContrato();
+    }
+
+    private boolean isGuaranteed(int client) {
+        return getContract(client) == GARANTIZADO;
+    }
+
+    private boolean centralInUse(int central) {
+        return getCentral(central).getProduccion() == leftPowerCentral[central];
+    }
+
+    // Returns the real consumption of a client given a central
+    private double getConsumption(Cliente client, Central central) {
+        return getRealConsumtion(getDistance(client, central), client.getConsumo());
+    }
+
+    // Distance in km and consum
+    private double getRealConsumtion(double distance, double consumption) {
+        double loses = 0;
+        if      (distance > 75) loses = 0.6;
+        else if (distance > 50) loses = 0.4;
+        else if (distance > 25) loses = 0.2;
+        else if (distance > 10) loses = 0.1;
+        return consumption * (1+loses);
+    }
+
+    private boolean canMove(int client, int central)
+    {
+        if (leftPowerCentral[central] < getConsumption(client)) return false;
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////
+    public void mouClient(int i, int j){
+        
+    }
+    
+    public void swapClient(int i, int j){
+        // swap client i amb client j
+        
     }
 }
