@@ -166,7 +166,7 @@ public class Main {
 			networkState.printState(false, 0);
 			long time = System.currentTimeMillis();
 			
-			Problem problem = new Problem (networkState, new ElectricalNetworkSuccessorFunction1(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction1());
+			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorFunction(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
 			Search search = new HillClimbingSearch();
 			SearchAgent agent = new SearchAgent (problem, search);
 			
