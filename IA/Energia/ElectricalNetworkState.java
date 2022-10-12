@@ -2,6 +2,7 @@ package IA.Energia;
 
 import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
+import java.lang.Math;
 
 import IA.Energia.*;
 
@@ -11,7 +12,7 @@ public class ElectricalNetworkState {
     private Centrales centrals;
 
     private int[] assignedClients; 
-    private int[] leftPowerCentral;
+    private double[] leftPowerCentral;
 
     private int benefici;
 
@@ -38,7 +39,7 @@ public class ElectricalNetworkState {
     public void generateInitialSolution(int method)
     {
         assignedClients = new int[clients.size()];
-        leftPowerCentral = new int[centrals.size()];
+        leftPowerCentral = new double[centrals.size()];
 
         switch(method) {
             case 0:
@@ -51,7 +52,50 @@ public class ElectricalNetworkState {
     }
 
     private void generateInitialSolution0() {
+        int tClients = clients.size();
+        int tCentrals = centrals.size();
 
+        // Energia Centrals = Producció
+        for (int i = 0; i < tCentrals; ++i) {
+            leftPowerCentral[i] = centrals.get(i).getProduccion();
+        }
+
+        // Assignació Clients
+        for (int i = 0; i < tClients; ++i) {
+            Cliente cl = clients.get(i);
+            int closest = 0;
+            double minDistance = 10000;
+            double minConsumption = 10000;
+            
+            for (int j = 0; j < tCentrals; ++j) {
+                Central ce = centrals.get(j);
+                double d = distance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
+                double consumption = cl.getConsumo() * powerLossCompensation(d);
+                if (consumption <= leftPowerCentral[j] && d < minDistance) {
+                    minDistance = d;
+                    closest = j;
+                    minConsumption = consumption;
+                }
+            }
+
+            System.out.println("Assigned client " + i + " to central " + close);
+            assignedClients[i] = closest;
+            leftPowerCentral[closest] -= minConsumption;
+        }
+    }
+
+    private double powerLossCompensation(double d) {
+        if (d <= 10) return 1;
+        if (d <= 25) return 1 / 0.9;
+        if (d <= 50) return 1 / 0.8;
+        if (d <= 75) return 1 / 0.6;
+        return 1 / 0.4;
+    }
+
+    private double distance(int x1, int y1, int x2, int y2) {
+        int distX = x1 - x2;
+        int distY = y1 - y2;
+        return Math.sqrt(distX*distX + distY*distY);
     }
 
     private void generateInitialSolution1() {}
