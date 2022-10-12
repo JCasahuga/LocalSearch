@@ -2,9 +2,13 @@ package IA.Energia;
 
 import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 import java.lang.Math;
 
 import IA.Energia.*;
+import aima.datastructures.PriorityQueue;
 
 public class ElectricalNetworkState {
     // Atributtes
@@ -52,35 +56,48 @@ public class ElectricalNetworkState {
     }
 
     private void generateInitialSolution0() {
-        int tClients = clients.size();
-        int tCentrals = centrals.size();
+        int tClients = getClientsNumber();
+        int tCentrals = getCentralsNumber();
 
         // Energia Centrals = Producció
         for (int i = 0; i < tCentrals; ++i) {
             leftPowerCentral[i] = centrals.get(i).getProduccion();
         }
 
-        // Assignació Clients
+        Vector<Integer> clientsOrdenats = new Vector<Integer>();
+        
         for (int i = 0; i < tClients; ++i) {
+            if (isGuaranteed(i)) 
+                clientsOrdenats.add(i);
+        }
+
+        for (int i = 0; i < tClients; ++i) {
+            if (!isGuaranteed(i)) 
+                clientsOrdenats.add(i);
+        }
+
+
+        // Assignació Clients
+        for (Integer i : clientsOrdenats) {
             Cliente cl = clients.get(i);
-            int closest = 0;
+            int closest = -1;
             double minDistance = 10000;
             double minConsumption = 10000;
-            
             for (int j = 0; j < tCentrals; ++j) {
                 Central ce = centrals.get(j);
-                double d = distance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
-                double consumption = cl.getConsumo() * powerLossCompensation(d);
+                double d = getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
+                double consumption = getConsumption(cl, ce);
                 if (consumption <= leftPowerCentral[j] && d < minDistance) {
                     minDistance = d;
                     closest = j;
                     minConsumption = consumption;
                 }
             }
-
-            System.out.println("Assigned client " + i + " to central " + close);
-            assignedClients[i] = closest;
-            leftPowerCentral[closest] -= minConsumption;
+            if (closest != -1)  {
+                assignedClients[i] = closest;
+                leftPowerCentral[closest] -= minConsumption;
+            }
+            //System.out.println("Assigned client " + i + " to central " + closest);
         }
     }
 
@@ -92,9 +109,15 @@ public class ElectricalNetworkState {
         return 1 / 0.4;
     }
 
-    private double distance(int x1, int y1, int x2, int y2) {
+    private double getDistance(int x1, int y1, int x2, int y2) {
         int distX = x1 - x2;
         int distY = y1 - y2;
+        return Math.sqrt(distX*distX + distY*distY);
+    }
+
+    private double getDistance(Cliente cl, Central ce) {
+        int distX = cl.getCoordX() - ce.getCoordX();
+        int distY = cl.getCoordY() - ce.getCoordY();
         return Math.sqrt(distX*distX + distY*distY);
     }
 
@@ -142,7 +165,7 @@ public class ElectricalNetworkState {
     }
 
     private Central getCentral(int central) {
-        return clients.get(central);
+        return centrals.get(central);
     }
 
     private double getConsumption(int client) {
@@ -154,7 +177,7 @@ public class ElectricalNetworkState {
     }
 
     private boolean isGuaranteed(int client) {
-        return getContract(client) == GARANTIZADO;
+        return getContract(client) == 0;
     }
 
     private boolean centralInUse(int central) {
@@ -168,12 +191,7 @@ public class ElectricalNetworkState {
 
     // Distance in km and consum
     private double getRealConsumtion(double distance, double consumption) {
-        double loses = 0;
-        if      (distance > 75) loses = 0.6;
-        else if (distance > 50) loses = 0.4;
-        else if (distance > 25) loses = 0.2;
-        else if (distance > 10) loses = 0.1;
-        return consumption * (1+loses);
+        return consumption * powerLossCompensation(distance);
     }
 
     private boolean canMove(int client, int central)
