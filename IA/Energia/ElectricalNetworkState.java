@@ -253,21 +253,40 @@ public class ElectricalNetworkState {
 
     private boolean canMove(int client, int central)
     {
-        if (leftPowerCentral[central] < getConsumption(client)) return false;
+        if (leftPowerCentral[central] < getRealConsumption(getClient(client), getCentral(central))) return false;
         return true;
     }
 
-    private void updateLeftPower(int central, int oldclientcons, int nouclientcons){
+    private boolean testSwap(int client1, int central1, int client2, int central2)
+    {
+        return ((leftPowerCentral[central2] + getRealConsumption(getClient(client2), getCentral(central2))) < getRealConsumption(getClient(client1), getCentral(central1))) && (leftPowerCentral[central1] + getRealConsumption(getClient(client1), getCentral(central1))) < getRealConsumption(getClient(client2), getCentral(central2));
+    }
+    private boolean canSwap(int client1, int central1, int client2, int central2)
+    {
+        if (!testSwap(client1, central1, client2, central2)) return false;
+        return true;
+    }
+
+    private void updateLeftPower(int central, double oldclientcons, double nouclientcons){
         leftPowerCentral[central] += oldclientcons - nouclientcons;
     }
 
     ///////////////////////////////////////////////////////
-    public void mouClient(int i, int j){
-        
+    public void mouClient(int client, int central){
+        if(canMove(client, central)){
+            assignedClients[client] = central;
+            updateLeftPower(central, 0, getRealConsumption(getClient(client), getCentral(central)));
+        }
     }
     
-    public void swapClient(int i, int j){
-        // swap client i amb client j
+    public void swapClient(int client1, int client2){
+        int central1 = assignedClients[client1], central2 = assignedClients[client2];
+        if(canSwap(client1, central1, client2, central2)){
+            assignedClients[client1] = central2;
+            updateLeftPower(central2, getRealConsumption(getClient(client2), getCentral(central2)), getRealConsumption(getClient(client1), getCentral(central2)));
+            assignedClients[client2] = central1;
+            updateLeftPower(central1, getRealConsumption(getClient(client1), getCentral(central1)), getRealConsumption(getClient(client2), getCentral(central1)));
+        }
         
     }
 }
