@@ -100,14 +100,14 @@ public class ElectricalNetworkState {
                 Central ce = centrals.get(j);
                 double d = getDistance(cl, ce);
 
-                if (getConsumption(cl, ce) <= leftPowerCentral[j] && d < minDistance) {
+                if (getRealConsumption(cl, ce) <= leftPowerCentral[j] && d < minDistance) {
                     minDistance = d;
                     closest = j;
-                    minConsumption = getConsumption(cl, ce);
+                    minConsumption = getRealConsumption(cl, ce);
                 }
             }
+            assignedClients[i] = closest;
             if (closest != -1)  {
-                assignedClients[i] = closest;
                 leftPowerCentral[closest] -= minConsumption;
             }
             //System.out.println("Assigned client " + i + " to central " + closest);
@@ -150,10 +150,7 @@ public class ElectricalNetworkState {
         System.out.println ("Central ocupation distr.:    " + getOccupationDistribution());
         System.out.println();
     }
-    
-    private int getBenefit() {
-        return benefici;
-    }
+
 
     private int getAverageDistanceToCentrals() {
         return 0;
@@ -173,8 +170,47 @@ public class ElectricalNetworkState {
         return centrals.size();
     }
 
-    public int heuristic(){
-        return benefici;
+    public double getBenefit(){
+        double benef = 0, costc = 0;
+        for(int i = 0; i < leftPowerCentral.length; ++i){
+            costc += costCentral(i);
+        }
+        for(int i = 0; i < assignedClients.length; ++i){
+            benef += beneficiClient(i);
+        }
+        return benef-costc;
+    }
+
+    private double costCentral(int central){
+        Centrtal c = getCentral(central);
+        double consumcentral = c.getProduccion();
+        switch(c.getTipo()){
+            case CENTRALA:
+                if(centralInUse(central)) return consumcentral*50 + 20000;
+                else return 15000;
+            case CENTRALB:
+                if(centralInUse(central)) return consumcentral*80+10000;
+                else return 5000;
+            case CENTRALC:
+                if(centralInUse(central)) return consumcentral*150+5000;
+                else return 1500;
+        }
+    }
+
+    private double beneficiClient(int client){
+        Cliente c = getClient(client);
+        double consumClient = c.getConsumo();
+        switch(c.getTipo()){
+            case CLIENTEXG:
+                if(c.getContrato() == GARANTIZADO) return consumClient*400;
+                else return consumClient*300;
+            case CLIENTEMG:
+                if(c.getContrato() == GARANTIZADO) return consumClient*500;
+                else return consumClient*400;
+            case CLIENTEG:
+                if(c.getContrato() == GARANTIZADO) return consumClient*600;
+                else return consumClient*500;
+        }
     }
 
     private Cliente getClient(int client) {
@@ -202,7 +238,7 @@ public class ElectricalNetworkState {
     }
 
     // Returns the real consumption of a client given a central
-    private double getConsumption(Cliente client, Central central) {
+    private double getRealConsumption(Cliente client, Central central) {
         return getRealConsumtion(getDistance(client, central), client.getConsumo());
     }
 
@@ -215,6 +251,10 @@ public class ElectricalNetworkState {
     {
         if (leftPowerCentral[central] < getConsumption(client)) return false;
         return true;
+    }
+
+    private void updateLeftPower(int central, int oldclientcons, int nouclientcons){
+        leftPowerCentral[central] += oldclientcons - nouclientcons;
     }
 
     ///////////////////////////////////////////////////////
