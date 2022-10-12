@@ -16,7 +16,7 @@ public class ElectricalNetworkState {
     public static final int CENTRALA = 0;
     public static final int CENTRALB = 1;
     public static final int CENTRALC = 2;
-    
+
     public static final int CLIENTEG = 2;
     public static final int CLIENTEMG = 1;
     public static final int CLIENTEXG = 0;
@@ -182,19 +182,21 @@ public class ElectricalNetworkState {
     }
 
     private double costCentral(int central){
-        Centrtal c = getCentral(central);
+        Central c = getCentral(central);
         double consumcentral = c.getProduccion();
         switch(c.getTipo()){
             case CENTRALA:
                 if(centralInUse(central)) return consumcentral*50 + 20000;
-                else return 15000;
+                return 15000;
             case CENTRALB:
                 if(centralInUse(central)) return consumcentral*80+10000;
-                else return 5000;
+                return 5000;
             case CENTRALC:
                 if(centralInUse(central)) return consumcentral*150+5000;
-                else return 1500;
+                return 1500;
         }
+        System.err.println("Error while getting cost central " + central);
+        return 0;
     }
 
     private double beneficiClient(int client){
@@ -203,14 +205,16 @@ public class ElectricalNetworkState {
         switch(c.getTipo()){
             case CLIENTEXG:
                 if(c.getContrato() == GARANTIZADO) return consumClient*400;
-                else return consumClient*300;
+                return consumClient*300;
             case CLIENTEMG:
                 if(c.getContrato() == GARANTIZADO) return consumClient*500;
-                else return consumClient*400;
+                return consumClient*400;
             case CLIENTEG:
                 if(c.getContrato() == GARANTIZADO) return consumClient*600;
-                else return consumClient*500;
+                return consumClient*500;
         }
+        System.err.println("Error while getting income client " + client);
+        return 0;
     }
 
     private Cliente getClient(int client) {

@@ -45,14 +45,13 @@ public class Main {
     		
     		switch (cmd) {
     			case "run":
-                    System.out.println("Not implemented");
                     Centrales centrals = new Centrales(numberOfCentrals, seed);
                     Clientes clients = new Clientes(numberOfClients, typeOfClients, propGuaranteed, seed);
                     // TODO: Executar segons params
 					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
 					networkState.generateInitialSolution(generationMethod);
 					run(networkState, algorithm, heuristic);
-
+					System.out.println("----------- Finished ----------");
     				break;
     				
     			case "ncentrals":
