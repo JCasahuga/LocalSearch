@@ -13,7 +13,16 @@ import aima.datastructures.PriorityQueue;
 public class ElectricalNetworkState {
 
     // Constants
+    public static final int CENTRALA = 0;
+    public static final int CENTRALB = 1;
+    public static final int CENTRALC = 2;
+    
+    public static final int CLIENTEG = 2;
+    public static final int CLIENTEMG = 1;
+    public static final int CLIENTEXG = 0;
+
     public static final int GARANTIZADO = 0;
+    public static final int NOGARANTIZADO = 1;
 
     // Atributtes
     private Clientes clients;
