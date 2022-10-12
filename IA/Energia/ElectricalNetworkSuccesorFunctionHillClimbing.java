@@ -12,6 +12,7 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
     public List getSuccessors(Object state){
 		ArrayList <Successor> retval = new ArrayList<>();
     	ElectricalNetworkState networkState = new ElectricalNetworkState ((ElectricalNetworkState) state);
+		retval.add(new Successor("Mateix estat", networkState));
 
 	
 	int totalClients = networkState.getClientsNumber();
