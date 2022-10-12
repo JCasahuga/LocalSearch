@@ -5,6 +5,7 @@ import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.AStarSearch;
+import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
@@ -45,9 +46,13 @@ public class Main {
     		switch (cmd) {
     			case "run":
                     System.out.println("Not implemented");
-                    Centrales centals = new Centrales(numberOfCentrals, seed);
+                    Centrales centrals = new Centrales(numberOfCentrals, seed);
                     Clientes clients = new Clientes(numberOfClients, typeOfClients, propGuaranteed, seed);
                     // TODO: Executar segons params
+					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
+					networkState.generateInitialSolution(generationMethod);
+					run(networkState, algorithm, heuristic);
+
     				break;
     				
     			case "ncentrals":
@@ -143,5 +148,39 @@ public class Main {
 		System.out.println ("cmds                     -- see commands");
 		System.out.println ("================");
     }
-    
+
+    // -------------------- Run model methods ---------------------------
+
+    private static boolean run(ElectricalNetworkState networkstate, int algorithm, int heuristic) {
+        boolean error = false;
+        
+        if      (algorithm == 0 &&  heuristic == 0)	error = ElectricalNetwork_HillClimbing_Benefici(networkstate);
+    	else if (algorithm == 1 &&  heuristic == 0)	error = ElectricalNetwork_SimulatedAnnealing_Benefici(networkstate);
+
+        return error;
+    }
+
+	private static boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
+        System.out.println ("Solution using Hill Climbing + Benefici: ");
+		try {
+			networkState.printState(false, 0);
+			long time = System.currentTimeMillis();
+			
+			Problem problem = new Problem (networkState, new ElectricalNetworkSuccessorFunction1(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction1());
+			Search search = new HillClimbingSearch();
+			SearchAgent agent = new SearchAgent (problem, search);
+			
+			networkState = (ElectricalNetworkState) search.getGoalState();
+			time = System.currentTimeMillis() - time;
+			
+			networkState.printState(true, time);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+    }
+
+    private static boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {return false;}
+
 }
