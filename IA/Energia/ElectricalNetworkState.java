@@ -19,23 +19,23 @@ public class ElectricalNetworkState {
     public ElectricalNetworkState(Clientes clients, Centrales centrals) {
         this.clients = clients;
         this.centrals = centrals;
-
-        assignedClients = new int[clients.size()];
-        leftPowerCentral = new int[centrals.size()];
     }
 
     public ElectricalNetworkState(ElectricalNetworkState networkState) {
         this.clients = networkState.clients;
         this.centrals = networkState.centrals;
 
-        assignedClients = new int[networkState.clients.size()];
-        leftPowerCentral = new int[networkState.centrals.size()];
+        this.assignedClients = networkState.assignedClients;
+        this.leftPowerCentral = networkState.leftPowerCentral;
     }
 
 
     //  ---------------------- Initial states generation --------------
     public void generateInitialSolution(int method)
     {
+        assignedClients = new int[clients.size()];
+        leftPowerCentral = new int[centrals.size()];
+
         switch(method) {
             case 0:
                 generateInitialSolution0();
@@ -47,7 +47,7 @@ public class ElectricalNetworkState {
     }
 
     private void generateInitialSolution0() {
-        
+
     }
 
     private void generateInitialSolution1() {}
@@ -86,11 +86,11 @@ public class ElectricalNetworkState {
                 
     }
 
-    public Clientes getConfiguraration() {
-        return null;
+    public int getClientsNumber() {
+        return clients.size();
     }
 
-    public Centrales getSolution() {
-        return null;
+    public int getCentralsNumber() {
+        return centrals.size();
     }
 }
