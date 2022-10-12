@@ -174,6 +174,7 @@ public class Main {
 			time = System.currentTimeMillis() - time;
 			
 			networkState.printState(true, time);
+			return true;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
