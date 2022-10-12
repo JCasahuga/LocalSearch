@@ -2,13 +2,22 @@ package IA.Energia;
 
 import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+import java.util.*;
+import java.util.function.ObjDoubleConsumer;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
+
 import java.lang.Math;
 
 import IA.Energia.*;
 import aima.datastructures.PriorityQueue;
+import aima.search.framework.SearchAgent;
 
 public class ElectricalNetworkState {
 
@@ -140,24 +149,68 @@ public class ElectricalNetworkState {
 
 
     // ------------------------ Funcions auxiliars ---------------------
-    public void printState(boolean finalState, double time)
+    public void printState(boolean finalState, double time, boolean printSteps, SearchAgent agent)
     {
         if (!finalState)System.out.println ("------- Starting generated solution: "); 
         else            System.out.println ("------- Final generated solution: "); 
+        
+        if (finalState && printSteps) {
+            printActions(agent.getActions());
+            printInstrumentation(agent.getInstrumentation());
+        }
         if (finalState) System.out.println ("Time to generate solution    " + time + " ms");
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
-        System.out.println ("Central ocupation distr.:    " + getOccupationDistribution());
+        System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
         System.out.println();
+
     }
 
-
-    private int getAverageDistanceToCentrals() {
-        return 0;
+    private static void printActions(List actions) {
+        for (int i = 0; i < actions.size(); i++) {
+            String action = (String) actions.get(i);
+            System.out.println(action);
+        }
     }
 
-    private int getOccupationDistribution() {
-        return 0;
+    private static void printInstrumentation(Properties properties) {
+        var keys = properties.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = (String) keys.next();
+            String property = properties.getProperty(key);
+            System.out.println(key + " : " + property);
+        }
+    }
+
+    private double getAverageDistanceToCentrals() {
+        double sum = 0, count = 0;
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            if (assignedClients[i] != -1) {
+                sum += getDistance(i, assignedClients[i]);
+                ++count;
+            }
+        }
+        return sum/count;
+    }
+
+    private String getOccupationDistribution() {
+        //String[] occupation = new String[10];
+        int[] count = new int[10];
+        //System.err.println("Getting occupation dist:");
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            double production = getCentral(i).getProduccion();
+            //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
+            int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
+            //System.err.println(index);
+            count[index]++;
+        }
+        // for (int i = 0; i < 10; ++i) {
+        //     occupation[i] = String.valueOf((double)count[i]/(double)getCentralsNumber());
+        //     //System.err.println(occupation[i] + " - " + count[i]);
+        // }
+        int[] countReversed = new int[10];
+        for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
+        return Arrays.toString(countReversed);
     }
 
     // -------------------- Funcions redefinides auxiliars ---------------------
@@ -246,6 +299,10 @@ public class ElectricalNetworkState {
         return getRealConsumtion(getDistance(client, central), client.getConsumo());
     }
 
+    private double getRealConsumption(int client, int central) {
+        return getRealConsumption(getClient(client), getCentral(central));
+    }
+
     // Distance in km and consum
     private double getRealConsumtion(double distance, double consumption) {
         return consumption * powerLossCompensation(distance);
@@ -273,9 +330,19 @@ public class ElectricalNetworkState {
 
     ///////////////////////////////////////////////////////
     public void mouClient(int client, int central){
+        //System.err.println("Moving " + client + " to central " + central);
         if(canMove(client, central)){
+            //System.err.println("Moved succesfuly!");
+            //System.err.println("Was " + assignedClients[client] + " now is " + central);
+            // System.err.println("Consum real client " + getRealConsumption(client, assignedClients[client]));
+            // System.err.println("Consum abans antiga" + leftPowerCentral[assignedClients[client]]);
+            updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
+            //System.err.println("Consum despres antiga" + leftPowerCentral[assignedClients[client]]);
+
             assignedClients[client] = central;
-            updateLeftPower(central, 0, getRealConsumption(getClient(client), getCentral(central)));
+            //System.err.println("Consum abans nova" + leftPowerCentral[assignedClients[client]]);
+            updateLeftPower(assignedClients[client], 0, getRealConsumption(client, assignedClients[client]));
+            //System.err.println("Consum despres nova" + leftPowerCentral[assignedClients[client]]);
         }
     }
     
