@@ -356,10 +356,11 @@ public class ElectricalNetworkState {
         int central1 = assignedClients[client1], central2 = assignedClients[client2];
         if(canSwap(client1, central1, client2, central2)){
             assignedClients[client1] = central2;
-            updateLeftPower(central2, getRealConsumption(getClient(client2), getCentral(central2)), getRealConsumption(getClient(client1), getCentral(central2)));
+            if(central2 != -1) updateLeftPower(central2, getRealConsumption(getClient(client2), getCentral(central2)), getRealConsumption(getClient(client1), getCentral(central2)));
             assignedClients[client2] = central1;
-            updateLeftPower(central1, getRealConsumption(getClient(client1), getCentral(central1)), getRealConsumption(getClient(client2), getCentral(central1)));
+            if(central1 != -1) updateLeftPower(central1, getRealConsumption(getClient(client1), getCentral(central1)), getRealConsumption(getClient(client2), getCentral(central1)));
         }
         
     }
+
 }
