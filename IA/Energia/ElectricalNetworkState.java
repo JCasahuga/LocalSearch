@@ -40,7 +40,7 @@ public class ElectricalNetworkState {
     private int[] assignedClients; 
     private double[] leftPowerCentral;
 
-    private int benefici;
+
 
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
@@ -48,16 +48,14 @@ public class ElectricalNetworkState {
     public ElectricalNetworkState(Clientes clients, Centrales centrals) {
         this.clients = clients;
         this.centrals = centrals;
-        this.benefici = 0;
     }
 
     public ElectricalNetworkState(ElectricalNetworkState networkState) {
-        this.clients = networkState.clients;
-        this.centrals = networkState.centrals;
+        this.clients = networkState.getClients();
+        this.centrals = networkState.getCentrals();
 
-        this.assignedClients = networkState.assignedClients;
-        this.leftPowerCentral = networkState.leftPowerCentral;
-        this.benefici = networkState.benefici;
+        this.assignedClients = networkState.getAssignedClients();
+        this.leftPowerCentral = networkState.getLeftPowerCentral();
     }
 
 
@@ -149,6 +147,22 @@ public class ElectricalNetworkState {
 
 
     // ------------------------ Funcions auxiliars ---------------------
+    public Clientes getClients(){
+        return clients;
+    }
+
+    public Centrales getCentrals(){
+        return centrals;
+    }
+
+    public int[] getAssignedClients(){
+        return assignedClients;
+    }
+
+    public double[] getLeftPowerCentral(){
+        return leftPowerCentral;
+    }
+
     public void printState(boolean finalState, double time, boolean printSteps, SearchAgent agent)
     {
         if (!finalState)System.out.println ("------- Starting generated solution: "); 
