@@ -112,7 +112,7 @@ public class Main {
         System.out.println("Current Values: ");
 		System.out.println("================");
 		
-		System.out.println("Number of centrals: " + numberOfCentrals);
+		System.out.println("Number of centrals: " + Arrays.toString(numberOfCentrals));
 		System.out.println("Number of clients: " + numberOfClients);
 		
 		if      (algorithm == 0) System.out.println("Search algorithm: hill climbing");

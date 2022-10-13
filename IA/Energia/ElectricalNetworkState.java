@@ -58,7 +58,6 @@ public class ElectricalNetworkState {
         this.leftPowerCentral = networkState.getLeftPowerCentral();
     }
 
-
     //  ---------------------- Initial states generation --------------
     public void generateInitialSolution(int method)
     {
@@ -196,7 +195,7 @@ public class ElectricalNetworkState {
         }
     }
 
-    private double getAverageDistanceToCentrals() {
+    public double getAverageDistanceToCentrals() {
         double sum = 0, count = 0;
         for (int i = 0; i < getClientsNumber(); ++i) {
             if (assignedClients[i] != -1) {
@@ -352,8 +351,8 @@ public class ElectricalNetworkState {
     public void mouClient(int client, int central){
         //System.err.println("Moving " + client + " to central " + central);
         if(canMove(client, central)){
-            //System.err.println("Moved succesfuly!");
-            //System.err.println("Was " + assignedClients[client] + " now is " + central);
+            System.err.println("Moved succesfuly!");
+            System.err.println("For client " + client + " was " + assignedClients[client] + " now is " + central);
             // System.err.println("Consum real client " + getRealConsumption(client, assignedClients[client]));
             // System.err.println("Consum abans antiga" + leftPowerCentral[assignedClients[client]]);
             updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
