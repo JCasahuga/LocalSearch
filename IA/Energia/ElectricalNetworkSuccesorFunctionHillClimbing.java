@@ -23,7 +23,9 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		for (int j = 0; j < totalCentrals; ++j) {
 		    //ElectricalNetworkState new_state = (ProbIA5Board) state;; 
 			ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
-			ElectricalNetworkState copia = new_state;
+			
+			//ElectricalNetworkState copia = new ElectricalNetworkState(networkState);
+
 		    new_state.mouClient(i, j);
 			//System.err.println("No ha mogut?: " + copia.equals(new_state));
 			//System.err.println("Moved client " + i + " to central " + j);
@@ -32,13 +34,13 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		}
 	}
 	
-	   for (int i = 0; i < totalClients; ++i) {
-	 	for (int j = 0; j < totalClients; ++j) {
-	 	    ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
-	 	    new_state.swapClient(i, j);
-	  	    retval.add(new Successor("actionName", new_state));
-	   	}
-	    }
+	// for (int i = 0; i < totalClients; ++i) {
+	// 	for (int j = 0; j < totalClients; ++j) {
+	// 	    ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
+	// 	    new_state.swapClient(i, j);
+	// 	    retval.add(new Successor("actionName", new_state));
+	// 	}
+	// }
         return retval;
     }
 }

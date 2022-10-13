@@ -40,8 +40,6 @@ public class ElectricalNetworkState {
     private int[] assignedClients; 
     private double[] leftPowerCentral;
 
-
-
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
 
@@ -51,12 +49,22 @@ public class ElectricalNetworkState {
     }
 
     public ElectricalNetworkState(ElectricalNetworkState networkState) {
-        this.clients = networkState.getClients();
-        this.centrals = networkState.getCentrals();
+        clients = networkState.getClients();
+        centrals = networkState.getCentrals();
 
-        this.assignedClients = networkState.getAssignedClients();
-        this.leftPowerCentral = networkState.getLeftPowerCentral();
+        assignedClients = Arrays.copyOf(networkState.getAssignedClients(), getClientsNumber());
+        leftPowerCentral = Arrays.copyOf(networkState.getLeftPowerCentral(), getCentralsNumber());
     }
+
+    // public ElectricalNetworkState(Clientes clnts, Centrales ctrls, int[] assigClt, double[] lfPwCtrl) {
+    //     clients = clnts;
+    //     centrals = ctrls;
+
+    //     assignedClients = assigClt;
+    //     leftPowerCentral = lfPwCtrl;
+    // }
+
+
 
     //  ---------------------- Initial states generation --------------
     public void generateInitialSolution(int method)
@@ -310,6 +318,7 @@ public class ElectricalNetworkState {
     }
 
     private boolean centralInUse(int central) {
+        //System.err.println("Produccio " + getCentral(central).getProduccion() + " power left " + leftPowerCentral[central] + " -- " + (getCentral(central).getProduccion() == leftPowerCentral[central]));
         return getCentral(central).getProduccion() == leftPowerCentral[central];
     }
 
@@ -351,8 +360,8 @@ public class ElectricalNetworkState {
     public void mouClient(int client, int central){
         //System.err.println("Moving " + client + " to central " + central);
         if(canMove(client, central)){
-            System.err.println("Moved succesfuly!");
-            System.err.println("For client " + client + " was " + assignedClients[client] + " now is " + central);
+            //System.err.println("Moved succesfuly!");
+            //System.err.println("For client " + client + " was " + assignedClients[client] + " now is " + central);
             // System.err.println("Consum real client " + getRealConsumption(client, assignedClients[client]));
             // System.err.println("Consum abans antiga" + leftPowerCentral[assignedClients[client]]);
             updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
