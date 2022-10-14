@@ -183,6 +183,7 @@ public class ElectricalNetworkState {
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
         System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
+        System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
 
     }
@@ -284,14 +285,28 @@ public class ElectricalNetworkState {
         double consumClient = c.getConsumo();
         switch(c.getTipo()){
             case CLIENTEXG:
-                if(c.getContrato() == GARANTIZADO) return consumClient*400;
-                return consumClient*300;
+                if(c.getContrato() == GARANTIZADO) {
+                    if (assignedClients[client] != -1) return consumClient*400;
+                    return -1000000;
+                }
+                if (assignedClients[client] != -1) return consumClient*300;
+                return -consumClient*50;
+
             case CLIENTEMG:
-                if(c.getContrato() == GARANTIZADO) return consumClient*500;
-                return consumClient*400;
+                if(c.getContrato() == GARANTIZADO) {
+                    if (assignedClients[client] != -1) return consumClient*500;
+                    return -1000000;
+                }
+                if (assignedClients[client] != -1) return consumClient*400;
+                return -consumClient*50;
+
             case CLIENTEG:
-                if(c.getContrato() == GARANTIZADO) return consumClient*600;
-                return consumClient*500;
+                if(c.getContrato() == GARANTIZADO) {
+                    if (assignedClients[client] != -1) return consumClient*600;
+                    return -1000000;
+                }
+                if (assignedClients[client] != -1) return consumClient*500;
+                return -consumClient*50;
         }
         System.err.println("Error while getting income client " + client);
         return 0;
@@ -336,14 +351,36 @@ public class ElectricalNetworkState {
         return consumption * powerLossCompensation(distance);
     }
 
-    private boolean canMove(int client, int central)
-    {
-        if (leftPowerCentral[central] < getRealConsumption(getClient(client), getCentral(central))) return false;
+    private boolean isValidState() {
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            if (isGuaranteed(i) && assignedClients[i] == -1) return false;
+        }
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (leftPowerCentral[i] < 0) return false;
+        }
         return true;
     }
 
-    private boolean canSwap(int c1, int c2) {
-        
+    private boolean canMove(int client, int central)
+    {
+        if (assignedClients[client] == -1 || isGuaranteed(client)) return false;
+        if (leftPowerCentral[central] < getRealConsumption(client, central)) return false;
+        return true;
+    }
+
+    private boolean canSwap(int client1, int central1, int client2, int central2) {
+        if (central1 == central2)             return false; // Si que es pot pero es inútil
+        if (central1 == -1) {
+            //System.err.println("Central 1 = -1");
+            return getRealConsumption(client2, central2) >= getRealConsumption(client1, central2);
+        }
+        if (central2 == -1) {
+            // System.err.println("Central 2 = -1");
+            return getRealConsumption(client1, central1) >= getRealConsumption(client2, central1);
+        }
+
+        return getRealConsumption(client1, central2) <= leftPowerCentral[central2] + getRealConsumption(client2, central2)
+            && getRealConsumption(client2, central1) <= leftPowerCentral[central1] + getRealConsumption(client1, central1);
     }
 
     private void updateLeftPower(int central, double oldclientcons, double nouclientcons){
@@ -360,7 +397,6 @@ public class ElectricalNetworkState {
             // System.err.println("Consum abans antiga" + leftPowerCentral[assignedClients[client]]);
             updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
             //System.err.println("Consum despres antiga" + leftPowerCentral[assignedClients[client]]);
-
             assignedClients[client] = central;
             //System.err.println("Consum abans nova" + leftPowerCentral[assignedClients[client]]);
             updateLeftPower(assignedClients[client], 0, getRealConsumption(client, assignedClients[client]));
@@ -370,7 +406,9 @@ public class ElectricalNetworkState {
     
     public void swapClient(int client1, int client2){
         int central1 = assignedClients[client1], central2 = assignedClients[client2];
+        //System.err.println("Peta!");
         if(canSwap(client1, central1, client2, central2)){
+            //System.err.println("Can swap!");
             assignedClients[client1] = central2;
             if(central2 != -1) updateLeftPower(central2, getRealConsumption(client2, central2), getRealConsumption(client1, central2));
             assignedClients[client2] = central1;
