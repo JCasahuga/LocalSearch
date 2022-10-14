@@ -342,14 +342,8 @@ public class ElectricalNetworkState {
         return true;
     }
 
-    private boolean testSwap(int client1, int central1, int client2, int central2)
-    {
-        return ((leftPowerCentral[central2] + getRealConsumption(getClient(client2), getCentral(central2))) < getRealConsumption(getClient(client1), getCentral(central1))) && (leftPowerCentral[central1] + getRealConsumption(getClient(client1), getCentral(central1))) < getRealConsumption(getClient(client2), getCentral(central2));
-    }
-    private boolean canSwap(int client1, int central1, int client2, int central2)
-    {
-        if (!testSwap(client1, central1, client2, central2)) return false;
-        return true;
+    private boolean canSwap(int c1, int c2) {
+        
     }
 
     private void updateLeftPower(int central, double oldclientcons, double nouclientcons){
@@ -378,11 +372,9 @@ public class ElectricalNetworkState {
         int central1 = assignedClients[client1], central2 = assignedClients[client2];
         if(canSwap(client1, central1, client2, central2)){
             assignedClients[client1] = central2;
-            if(central2 != -1) updateLeftPower(central2, getRealConsumption(getClient(client2), getCentral(central2)), getRealConsumption(getClient(client1), getCentral(central2)));
+            if(central2 != -1) updateLeftPower(central2, getRealConsumption(client2, central2), getRealConsumption(client1, central2));
             assignedClients[client2] = central1;
-            if(central1 != -1) updateLeftPower(central1, getRealConsumption(getClient(client1), getCentral(central1)), getRealConsumption(getClient(client2), getCentral(central1)));
-        }
-        
+            if(central1 != -1) updateLeftPower(central1, getRealConsumption(client1, central1), getRealConsumption(client2, central1));
+        }   
     }
-
 }
