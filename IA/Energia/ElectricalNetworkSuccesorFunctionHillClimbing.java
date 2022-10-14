@@ -34,13 +34,14 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		}
 	}
 	
-	// for (int i = 0; i < totalClients; ++i) {
-	// 	for (int j = 0; j < totalClients; ++j) {
-	// 	    ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
-	// 	    new_state.swapClient(i, j);
-	// 	    retval.add(new Successor("actionName", new_state));
-	// 	}
-	// }
+	for (int i = 0; i < totalClients; ++i) {
+		for (int j = 0; j < totalClients; ++j) {
+		    ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
+		    new_state.swapClient(i, j);
+			action = "Swaped client " + i + " for " + j;
+		    retval.add(new Successor("actionName", new_state));
+		}
+	}
         return retval;
     }
 }
