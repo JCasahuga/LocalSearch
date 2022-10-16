@@ -1,6 +1,7 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "/home/jcasahuga/Documents/UPC/AI/CentralEnergia/CentralEnergia.jar"
+        "/home/jcasahuga/Documents/UPC/AI/CentralEnergia/CentralEnergia.jar",
+        "/home/jcasahuga/Documents/UPC/AI/AIMA/AIMA.jar"
     ]
 }

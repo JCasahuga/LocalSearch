@@ -1,19 +1,13 @@
 
 import IA.Energia.*;
-import aima.search.framework.GraphSearch;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
-import aima.search.informed.AStarSearch;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 import java.util.Scanner;
-import java.util.Vector;
 
 
 public class Main {

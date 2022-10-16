@@ -21,13 +21,13 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		String action;
 		for (int i = 0; i < totalClients; ++i) {
 			for (int j = 0; j < totalCentrals; ++j) {
-				//ElectricalNetworkState new_state = (ProbIA5Board) state;; 
 				ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
-				
-				//ElectricalNetworkState copia = new ElectricalNetworkState(networkState);
-
 				new_state.mouClient(i, j);
-				//System.err.println("No ha mogut?: " + copia.equals(new_state));
+				//System.out.println(new_state.getBenefit());
+
+				System.err.println("No ha mogut?: " + state.equals(new_state));
+
+				System.out.println(new_state.getAssignedClients());
 				//System.err.println("Moved client " + i + " to central " + j);
 				action = "Moved client " + i + " to central " + j;
 				//System.out.println(action);

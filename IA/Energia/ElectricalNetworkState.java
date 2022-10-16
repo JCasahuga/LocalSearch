@@ -150,7 +150,55 @@ public class ElectricalNetworkState {
         return getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
     }
 
-    private void generateInitialSolution1() {}
+    private void generateInitialSolution1() {
+        int tClients = getClientsNumber();
+        int tCentrals = getCentralsNumber();
+
+        // Energia Centrals = Producció
+        for (int i = 0; i < tCentrals; ++i) {
+            leftPowerCentral[i] = centrals.get(i).getProduccion();
+        }
+
+        Vector<Integer> clientsOrdenats = new Vector<Integer>();
+        
+        for (int i = 0; i < tClients; ++i) {
+            if (isGuaranteed(i)) 
+                clientsOrdenats.add(i);
+        }
+
+        for (int i = 0; i < tClients; ++i) {
+            if (!isGuaranteed(i)) 
+                clientsOrdenats.add(i);
+        }
+
+
+        // Assignació Clients
+        for (Integer i : clientsOrdenats) {
+            Cliente cl = clients.get(i);
+            int closest = -1;
+            double minDistance = 10000;
+            double minConsumption = 10000;
+            for (int j = 0; j < tCentrals; ++j) {
+                Central ce = centrals.get(j);
+                double d = getDistance(cl, ce);
+
+                if (getRealConsumption(cl, ce) <= leftPowerCentral[j] && isGuaranteed(i)) {
+                    if (d < minDistance) {
+                        minDistance = d;
+                        closest = j;
+                        minConsumption = getRealConsumption(cl, ce);
+                    }
+                }
+            }
+            
+            assignedClients[i] = closest;
+            if (closest != -1)  {
+                leftPowerCentral[closest] -= minConsumption;
+            }
+
+            //System.out.println("Assigned client " + i + " to central " + closest);
+        }
+    }
 
 
     // ------------------------ Funcions auxiliars ---------------------
@@ -185,7 +233,11 @@ public class ElectricalNetworkState {
         System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
         System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
-
+        int count = 0;
+        for (int i = 0; i < clients.size(); ++i) {
+            if (assignedClients[i] != -1) ++count;
+        }
+        System.out.println(count);
     }
 
     private static void printActions(List actions) {
@@ -270,10 +322,10 @@ public class ElectricalNetworkState {
                 if(centralInUse(central)) return consumcentral*50 + 20000;
                 return 15000;
             case CENTRALB:
-                if(centralInUse(central)) return consumcentral*80+10000;
+                if(centralInUse(central)) return consumcentral*80 + 10000;
                 return 5000;
             case CENTRALC:
-                if(centralInUse(central)) return consumcentral*150+5000;
+                if(centralInUse(central)) return consumcentral*150 + 5000;
                 return 1500;
         }
         System.err.println("Error while getting cost central " + central);
