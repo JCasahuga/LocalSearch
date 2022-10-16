@@ -231,6 +231,7 @@ public class ElectricalNetworkState {
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
         System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
+        System.out.println ("Nombre de clients assignats  " + numberOfAssignedClients() + " / " + getClientsNumber());
         System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
         int count = 0;
@@ -265,6 +266,12 @@ public class ElectricalNetworkState {
             }
         }
         return sum/count;
+    }
+
+    private int numberOfAssignedClients() {
+        int count = 0;
+        for (int i : assignedClients) if (i != -1) ++count;
+        return count;
     }
 
     /** 
