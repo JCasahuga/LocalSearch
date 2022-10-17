@@ -309,6 +309,7 @@ public class ElectricalNetworkState {
         return centrals.size();
     }
 
+    /** Returns the benefit of the current state. Use getDynamicBenefit if possible. */
     public double getBenefit(){
         double benef = 0, costc = 0;
         for(int i = 0; i < leftPowerCentral.length; ++i){
@@ -320,6 +321,7 @@ public class ElectricalNetworkState {
         return benef-costc;
     }
 
+    /** Returns the current state's benefit (it is autoupdated on each "move") */
     public double getDynamicBenefit() {
         return benefDynamic;
     }
