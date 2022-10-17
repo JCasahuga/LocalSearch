@@ -222,15 +222,16 @@ public class ElectricalNetworkState {
         return leftPowerCentral;
     }
 
-    public void printState(boolean finalState, double time, boolean printSteps, SearchAgent agent)
+    public void printState(boolean finalState, double time, boolean printSteps, SearchAgent agent, int algorithm)
     {
         if (!finalState)System.out.println ("------- Starting generated solution: "); 
         else            System.out.println ("------- Final generated solution: "); 
         
-        if (finalState && printSteps) {
+        if (algorithm == 0 && finalState && printSteps) { // We only print for HC
             printActions(agent.getActions());
             printInstrumentation(agent.getInstrumentation());
         }
+
         if (finalState) System.out.println ("Time to generate solution    " + time + " ms");
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());

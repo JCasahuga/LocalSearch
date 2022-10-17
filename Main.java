@@ -4,6 +4,7 @@ import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
+import aima.search.informed.SimulatedAnnealingSearch;
 import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
@@ -113,11 +114,11 @@ public class Main {
 		else if (algorithm == 1) System.out.println("Search algorithm: simulated annealing");
         else                     System.out.println("ERROR: No search algorithm");
 		
-		if      (heuristic == 0) System.out.println("heuristica: 1");
-		else if (heuristic == 1) System.out.println("heuristica: 2");
+		if      (heuristic == 0) System.out.println("heuristica: 0");
+		else if (heuristic == 1) System.out.println("heuristica: 1");
         else                     System.out.println("ERROR: No heuristic");
 		
-		if      (generationMethod == 0) System.out.println("Generation method: 1");
+		if      (generationMethod == 0) System.out.println("Generation method: 0");
 		else if (generationMethod == 1) System.out.println("Generation method: 1");
         else                     System.out.println("ERROR: No generation method");
 		
@@ -156,7 +157,7 @@ public class Main {
 	private static boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
         System.out.println ("Solution using Hill Climbing + Benefici: ");
 		try {
-			networkState.printState(false, 0, false, null);
+			networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
 			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
@@ -166,7 +167,7 @@ public class Main {
 			networkState = (ElectricalNetworkState) search.getGoalState();
 			time = System.currentTimeMillis() - time;
 			
-			networkState.printState(true, time, true, agent);
+			networkState.printState(true, time, true, agent, algorithm);
 			return true;
 		}
 		catch (Exception e) {
@@ -176,7 +177,25 @@ public class Main {
     }
 
     private static boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {
-		return false;
+		System.out.println ("Solution using Simulated Annealing + Benefici: ");
+		try {
+			networkState.printState(false, 0, false, null, algorithm);
+			long time = System.currentTimeMillis();
+			
+			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorSimulatedAnnealing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
+			Search search = new SimulatedAnnealingSearch();
+			SearchAgent agent = new SearchAgent (problem, search);
+			
+			networkState = (ElectricalNetworkState) search.getGoalState();
+			time = System.currentTimeMillis() - time;
+			
+			networkState.printState(true, time, true, agent, algorithm);
+			return true;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }
