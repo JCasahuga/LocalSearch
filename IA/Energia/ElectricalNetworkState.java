@@ -417,7 +417,7 @@ public class ElectricalNetworkState {
 
     private boolean canMove(int client, int central)
     {
-        if (assignedClients[client] == -1 || isGuaranteed(client)) return false;
+        if (assignedClients[client] == -1 && isGuaranteed(client)) return false;
         if (leftPowerCentral[central] < getRealConsumption(client, central)) return false;
         return true;
     }
@@ -449,11 +449,11 @@ public class ElectricalNetworkState {
             //System.err.println("For client " + client + " was " + assignedClients[client] + " now is " + central);
             // System.err.println("Consum real client " + getRealConsumption(client, assignedClients[client]));
             // System.err.println("Consum abans antiga" + leftPowerCentral[assignedClients[client]]);
-            updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
+            if (assignedClients[client] != -1) updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
             //System.err.println("Consum despres antiga" + leftPowerCentral[assignedClients[client]]);
             assignedClients[client] = central;
             //System.err.println("Consum abans nova" + leftPowerCentral[assignedClients[client]]);
-            updateLeftPower(assignedClients[client], 0, getRealConsumption(client, assignedClients[client]));
+            updateLeftPower(central, 0, getRealConsumption(client, assignedClients[client]));
             //System.err.println("Consum despres nova" + leftPowerCentral[assignedClients[client]]);
         }
     }
