@@ -175,6 +175,8 @@ public class Main {
 		}
     }
 
-    private static boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {return false;}
+    private static boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {
+		return false;
+	}
 
 }

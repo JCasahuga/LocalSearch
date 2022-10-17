@@ -20,7 +20,7 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		
 		String action;
 		for (int i = 0; i < totalClients; ++i) {
-			for (int j = 0; j < totalCentrals; ++j) {
+			for (int j = -1; j < totalCentrals; ++j) {
 				ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
 				new_state.mouClient(i, j);
 
@@ -32,6 +32,13 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 				//System.out.println(action);
 				retval.add(new Successor(action, new_state));
 			}
+		}
+
+		for (int i = 0; i < totalCentrals; ++i) {
+			ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
+			new_state.resetCentral(i);
+			action = "Eliminat clients central" + i;
+			retval.add(new Successor(action, new_state));
 		}
 
 		for (int i = 0; i < totalClients; ++i) {

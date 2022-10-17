@@ -425,13 +425,17 @@ public class ElectricalNetworkState {
 
     private boolean canMove(int client, int central)
     {
+        if (assignedClients[client] == central) return false;
         if (central == -1 && isGuaranteed(client)) return false;
-        if (leftPowerCentral[central] < getRealConsumption(client, central)) return false;
+        if (central == -1 || leftPowerCentral[central] < getRealConsumption(client, central)) return false;
         return true;
     }
 
     private boolean canSwap(int client1, int central1, int client2, int central2) {
-        if (central1 == central2)             return false; // Si que es pot pero es inútil
+        if (central1 == central2) return false; // Si que es pot pero es inútil
+        if (central1 == -1 && isGuaranteed(client2)) return false;
+        if (central2 == -1 && isGuaranteed(client1)) return false;
+
         if (central1 == -1) {
             //System.err.println("Central 1 = -1");
             return getRealConsumption(client2, central2) >= getRealConsumption(client1, central2);
@@ -532,5 +536,13 @@ public class ElectricalNetworkState {
             }
         
         }   
+    }
+
+    public void resetCentral(int central){
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            benefDynamic -= beneficiClient(i);
+            assignedClients[i] = -1;
+            benefDynamic += beneficiClient(i);
+        }
     }
 }
