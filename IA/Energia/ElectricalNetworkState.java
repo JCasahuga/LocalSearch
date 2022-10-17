@@ -234,11 +234,6 @@ public class ElectricalNetworkState {
         System.out.println ("Nombre de clients assignats  " + numberOfAssignedClients() + " / " + getClientsNumber());
         System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
-        int count = 0;
-        for (int i = 0; i < clients.size(); ++i) {
-            if (assignedClients[i] != -1) ++count;
-        }
-        System.out.println(count);
     }
 
     private static void printActions(List actions) {

@@ -25,9 +25,9 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 				new_state.mouClient(i, j);
 				//System.out.println(new_state.getBenefit());
 
-				System.err.println("No ha mogut?: " + state.equals(new_state));
+				//System.err.println("No ha mogut?: " + state.equals(new_state));
 
-				System.out.println(new_state.getAssignedClients());
+				//System.out.println(new_state.getAssignedClients());
 				//System.err.println("Moved client " + i + " to central " + j);
 				action = "Moved client " + i + " to central " + j;
 				//System.out.println(action);
