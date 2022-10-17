@@ -1,19 +1,13 @@
 
 import IA.Energia.*;
-import aima.search.framework.GraphSearch;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
-import aima.search.informed.AStarSearch;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 import java.util.Scanner;
-import java.util.Vector;
 
 
 public class Main {
@@ -45,14 +39,13 @@ public class Main {
     		
     		switch (cmd) {
     			case "run":
-                    System.out.println("Not implemented");
                     Centrales centrals = new Centrales(numberOfCentrals, seed);
                     Clientes clients = new Clientes(numberOfClients, typeOfClients, propGuaranteed, seed);
                     // TODO: Executar segons params
 					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
 					networkState.generateInitialSolution(generationMethod);
 					run(networkState, algorithm, heuristic);
-
+					System.out.println("----------- Finished ----------");
     				break;
     				
     			case "ncentrals":
@@ -113,7 +106,7 @@ public class Main {
         System.out.println("Current Values: ");
 		System.out.println("================");
 		
-		System.out.println("Number of centrals: " + numberOfCentrals);
+		System.out.println("Number of centrals: " + Arrays.toString(numberOfCentrals));
 		System.out.println("Number of clients: " + numberOfClients);
 		
 		if      (algorithm == 0) System.out.println("Search algorithm: hill climbing");
@@ -163,7 +156,7 @@ public class Main {
 	private static boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
         System.out.println ("Solution using Hill Climbing + Benefici: ");
 		try {
-			networkState.printState(false, 0);
+			networkState.printState(false, 0, false, null);
 			long time = System.currentTimeMillis();
 			
 			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
@@ -173,7 +166,7 @@ public class Main {
 			networkState = (ElectricalNetworkState) search.getGoalState();
 			time = System.currentTimeMillis() - time;
 			
-			networkState.printState(true, time);
+			networkState.printState(true, time, true, agent);
 			return true;
 		}
 		catch (Exception e) {
