@@ -39,6 +39,7 @@ public class ElectricalNetworkState {
 
     private int[] assignedClients; 
     private double[] leftPowerCentral;
+    private double benefDynamic = 0;
 
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
@@ -54,6 +55,7 @@ public class ElectricalNetworkState {
 
         assignedClients = Arrays.copyOf(networkState.getAssignedClients(), getClientsNumber());
         leftPowerCentral = Arrays.copyOf(networkState.getLeftPowerCentral(), getCentralsNumber());
+        benefDynamic = networkState.getDynamicBenefit();
     }
 
     // public ElectricalNetworkState(Clientes clnts, Centrales ctrls, int[] assigClt, double[] lfPwCtrl) {
@@ -80,6 +82,8 @@ public class ElectricalNetworkState {
                 generateInitialSolution1();
                 break;
         }
+
+        benefDynamic = getBenefit();
     }
 
     private void generateInitialSolutionClosest() {
@@ -316,6 +320,10 @@ public class ElectricalNetworkState {
         return benef-costc;
     }
 
+    public double getDynamicBenefit() {
+        return benefDynamic;
+    }
+
     private double costCentral(int central){
         Central c = getCentral(central);
         double consumcentral = c.getProduccion();
@@ -388,7 +396,7 @@ public class ElectricalNetworkState {
 
     private boolean centralInUse(int central) {
         //System.err.println("Produccio " + getCentral(central).getProduccion() + " power left " + leftPowerCentral[central] + " -- " + (getCentral(central).getProduccion() == leftPowerCentral[central]));
-        return getCentral(central).getProduccion() == leftPowerCentral[central];
+        return getCentral(central).getProduccion() != leftPowerCentral[central];
     }
 
     // Returns the real consumption of a client given a central
@@ -417,7 +425,7 @@ public class ElectricalNetworkState {
 
     private boolean canMove(int client, int central)
     {
-        if (assignedClients[client] == -1 && isGuaranteed(client)) return false;
+        if (central == -1 && isGuaranteed(client)) return false;
         if (leftPowerCentral[central] < getRealConsumption(client, central)) return false;
         return true;
     }
@@ -449,24 +457,80 @@ public class ElectricalNetworkState {
             //System.err.println("For client " + client + " was " + assignedClients[client] + " now is " + central);
             // System.err.println("Consum real client " + getRealConsumption(client, assignedClients[client]));
             // System.err.println("Consum abans antiga" + leftPowerCentral[assignedClients[client]]);
+
+            int orCentral = assignedClients[client];
+            double orClient = beneficiClient(client);
+
+            Boolean centralWasInUse = centralInUse(central);
+            double cost = costCentral(central);
+
+            Boolean orCentralWasInUse = false;
+            double orCost = 0;
+            
+            if (orCentral != -1)  {
+                orCentralWasInUse = centralInUse(assignedClients[client]);
+                orCost = costCentral(assignedClients[client]);
+            }
+
             if (assignedClients[client] != -1) updateLeftPower(assignedClients[client], 0, -getRealConsumption(client, assignedClients[client]));
             //System.err.println("Consum despres antiga" + leftPowerCentral[assignedClients[client]]);
             assignedClients[client] = central;
             //System.err.println("Consum abans nova" + leftPowerCentral[assignedClients[client]]);
             updateLeftPower(central, 0, getRealConsumption(client, assignedClients[client]));
-            //System.err.println("Consum despres nova" + leftPowerCentral[assignedClients[client]]);
+            
+            //System.err.println("Benefici despres nova " + benefDynamic);
+            
+            if ((centralInUse(central) && !centralWasInUse) || (!centralInUse(central) && centralWasInUse)) {
+                System.err.println("Change 1");
+                benefDynamic += cost;
+                benefDynamic -= costCentral(central);
+            }
+            if (orCentral != -1) {
+                if ((centralInUse(orCentral) && !orCentralWasInUse) || (!centralInUse(orCentral) && orCentralWasInUse)) {
+                    System.err.println("Change 2");
+                    benefDynamic += orCost;
+                    benefDynamic -= costCentral(orCentral);
+                }
+            } else if (orCentral == -1) {
+                //System.err.println("Change 3");
+                benefDynamic -= orClient;
+                benefDynamic += beneficiClient(client);
+            }
+
+            /*
+            double dynBen = benefDynamic;
+            double nouBen = getBenefit();
+            if (nouBen != dynBen) {
+                System.err.println(client + " " + orCentral + " " + central);
+                System.err.println("Benefici despres nova " + dynBen);
+                System.err.println("Benefici despres nova " + nouBen);
+                System.err.println();
+            }
+            */
+            //System.err.println("Consum despres nova " + leftPowerCentral[assignedClients[client]]);
         }
     }
     
     public void swapClient(int client1, int client2){
         int central1 = assignedClients[client1], central2 = assignedClients[client2];
-        //System.err.println("Peta!");
         if(canSwap(client1, central1, client2, central2)){
             //System.err.println("Can swap!");
+            
+            double oldC1 = beneficiClient(client1);
+            double oldC2 = beneficiClient(client2);
+
             assignedClients[client1] = central2;
             if(central2 != -1) updateLeftPower(central2, getRealConsumption(client2, central2), getRealConsumption(client1, central2));
             assignedClients[client2] = central1;
             if(central1 != -1) updateLeftPower(central1, getRealConsumption(client1, central1), getRealConsumption(client2, central1));
+        
+            if (assignedClients[client1] != assignedClients[client2] && (assignedClients[client1] == -1 || assignedClients[client2] == -1) ) {
+                benefDynamic -= oldC1;
+                benefDynamic += beneficiClient(client1);
+                benefDynamic -= oldC2;
+                benefDynamic += beneficiClient(client2);
+            }
+        
         }   
     }
 }
