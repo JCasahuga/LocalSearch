@@ -1,27 +1,21 @@
 
 import IA.Energia.*;
-import aima.search.framework.GraphSearch;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
-import aima.search.informed.AStarSearch;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 import java.util.Scanner;
-import java.util.Vector;
 
 
 public class Main {
 
-    static private int[] numberOfCentrals = new int[]{5, 10, 25};          // Centrals type A, B, C (?)
-    static private int numberOfClients = 1000;                               // Number of clients
-    static private double[] typeOfClients = new double[]{0.25, 0.3, 0.45};       // Client type XG, MG, G (?)
-    static private double propGuaranteed = 0.75;                             // % of clients with guaranteed supply
+    static private int[] numberOfCentrals = new int[]{5, 10, 25};           // Centrals type A, B, C (?)
+    static private int numberOfClients = 1000;                              // Number of clients
+    static private double[] typeOfClients = new double[]{0.25, 0.3, 0.45};  // Client type XG, MG, G (?)
+    static private double propGuaranteed = 0.75;                            // % of clients with guaranteed supply
     static private int algorithm = 0;                                       // (0) - Hill Climbling, (1) - Simulated Annealing
     static private int generationMethod = 0;                                // (0) - , (1) - , (2) - ...
     static private int heuristic = 0;                                       // (0) - ,...
@@ -45,14 +39,13 @@ public class Main {
     		
     		switch (cmd) {
     			case "run":
-                    System.out.println("Not implemented");
                     Centrales centrals = new Centrales(numberOfCentrals, seed);
                     Clientes clients = new Clientes(numberOfClients, typeOfClients, propGuaranteed, seed);
                     // TODO: Executar segons params
 					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
 					networkState.generateInitialSolution(generationMethod);
 					run(networkState, algorithm, heuristic);
-
+					System.out.println("----------- Finished ----------");
     				break;
     				
     			case "ncentrals":
@@ -113,7 +106,7 @@ public class Main {
         System.out.println("Current Values: ");
 		System.out.println("================");
 		
-		System.out.println("Number of centrals: " + numberOfCentrals);
+		System.out.println("Number of centrals: " + Arrays.toString(numberOfCentrals));
 		System.out.println("Number of clients: " + numberOfClients);
 		
 		if      (algorithm == 0) System.out.println("Search algorithm: hill climbing");
@@ -141,7 +134,7 @@ public class Main {
         System.out.println ("typeclient <XG> <MG> <G> -- change client types");
         System.out.println ("gclient <N>              -- change % of clients with guaranteed supply ");
 		System.out.println ("algo <I>                 -- change search algorithm ([0]- Hill climbing, [1]- Simulated annealing)");
-		System.out.println ("genmethod <I>            -- change generation method ([0]- , [1]- )");
+		System.out.println ("genmethod <I>            -- change generation method ([0]- Closest, [1]- )");
 		System.out.println ("heur <I>                 -- change heuristic ([0]- , [1]- )");
 		System.out.println ("seed <I>                 -- change the seed");
 		System.out.println ("print                    -- see current values");
@@ -163,17 +156,17 @@ public class Main {
 	private static boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
         System.out.println ("Solution using Hill Climbing + Benefici: ");
 		try {
-			networkState.printState(false, 0);
+			networkState.printState(false, 0, false, null);
 			long time = System.currentTimeMillis();
 			
-			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorFunction(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
+			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
 			Search search = new HillClimbingSearch();
 			SearchAgent agent = new SearchAgent (problem, search);
 			
 			networkState = (ElectricalNetworkState) search.getGoalState();
 			time = System.currentTimeMillis() - time;
 			
-			networkState.printState(true, time);
+			networkState.printState(true, time, true, agent);
 			return true;
 		}
 		catch (Exception e) {
