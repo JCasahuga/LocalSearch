@@ -1,0 +1,57 @@
+package IA.Energia;
+
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+import aima.search.framework.Successor;
+import aima.search.framework.SuccessorFunction;
+
+public class AbastecimientoSuccessorSimulaedAnnealing implements SuccessorFunction {
+		    
+    // Set the probability of each step happening (must add up 1)
+    //                                             moveClient, swapClient
+    private static double[] probability = new double[  0.5,        0.5];
+    private static int saDepth = 50;
+    private static int numberOfSuccessors = 100000;
+
+    public List getSuccessors (Object state) {
+
+    	ArrayList <Successor> retval = new ArrayList<>();
+    	ElectricalNetworkState currentState = (AbastecimientoState) state;
+    	
+    	String s;
+    	
+        int max = probability.size();
+    	int numIter = 0;
+        for (int i = 0; i < numberOfSuccessors; ++i) {
+            
+            ElectricalNetworkState nextState = new ElectricalNetworkState (currentState);
+
+            for (int j = 0; j < saDepth; ++j) {
+                
+                
+                switch (randomNum){
+                // Move Client
+                case 0:
+                    
+                    break;    			
+                // Switch Client
+                case 1:
+                    
+                    break;
+                    
+                default:
+                    System.err.println("uooo you shouldn't be here... (error in sa successor function)");
+                    break;
+                }
+            }
+            retval.add(nextState);
+            return saSucesores;
+        }
+    }
+
+    private getRandomStep() {
+        Random rand = new Random();
+        double randomNum = rand.nextInt(100);
+    }
+}
