@@ -457,7 +457,7 @@ public class ElectricalNetworkState {
     }
 
     ///////////////////////////////////////////////////////
-    public void mouClient(int client, int central){
+    public boolean mouClient(int client, int central){
         //System.err.println("Moving " + client + " to central " + central);
         if(canMove(client, central)){
             //System.err.println("Moved succesfuly!");
@@ -515,10 +515,12 @@ public class ElectricalNetworkState {
             }
             */
             //System.err.println("Consum despres nova " + leftPowerCentral[assignedClients[client]]);
+            return true;
         }
+        return false;
     }
     
-    public void swapClient(int client1, int client2){
+    public boolean swapClient(int client1, int client2){
         int central1 = assignedClients[client1], central2 = assignedClients[client2];
         if(canSwap(client1, central1, client2, central2)){
             //System.err.println("Can swap!");
@@ -537,15 +539,17 @@ public class ElectricalNetworkState {
                 benefDynamic -= oldC2;
                 benefDynamic += beneficiClient(client2);
             }
-        
+            return true;
         }   
+        return false;
     }
 
-    public void resetCentral(int central){
+    public boolean resetCentral(int central){
         for (int i = 0; i < getClientsNumber(); ++i) {
             benefDynamic -= beneficiClient(i);
             assignedClients[i] = -1;
             benefDynamic += beneficiClient(i);
         }
+        return true;
     }
 }

@@ -17,8 +17,8 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
     private static int swapCases;
     private static int resetCases;
 
-    private static int saDepth = 250;
-    private static int numberOfSuccessors = 500;
+    private static int saDepth = 1;
+    private static int numberOfSuccessors = 1;
 
     public List getSuccessors (Object state) {
 
@@ -39,37 +39,39 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
             
             ElectricalNetworkState nextState = new ElectricalNetworkState(networkState);
 
-            for (int j = 0; j < saDepth; ++j) {
-                
-                int k = getRandomStep(totalCases);
-                //System.err.println("k is " + k);
-                switch (k){
-                // Move Client
-                case 0:
-                    int client = rand.nextInt(clientsNumber), central = rand.nextInt(centralsNumber);
-                    nextState.mouClient(client, central);
-                    action = "Moved client " + client + " to central " + central;
-                    //System.err.println(action);
-                    break;    			
-                // Switch Client
-                case 1:
-                    int client1 = rand.nextInt(clientsNumber), client2 = rand.nextInt(clientsNumber);
-                    nextState.swapClient(client1, client2);
-                    action = "Swaped client " + client1 + " for " + client2;
-                    //System.err.println(action);
-                    break;
-                // Reset Central
-                case 2:
-                    int centralRemoved = rand.nextInt(centralsNumber);
-                    nextState.resetCentral(centralRemoved);
-                    action = "Eliminat clients central" + centralRemoved;
-                    //System.err.println(action);
-                    retval.add(new Successor(action, nextState));
-                    break;
-                // Default
-                default:
-                    System.err.println("uooo you shouldn't be here... (error in sa successor function)");
-                    break;
+            boolean actionDone = false;
+            while (!actionDone) {
+                for (int j = 0; j < saDepth; ++j) {
+                    int k = getRandomStep(totalCases);
+                    //System.err.println("k is " + k);
+                    switch (k){
+                    // Move Client
+                    case 0:
+                        int client = rand.nextInt(clientsNumber), central = rand.nextInt(centralsNumber);
+                        actionDone = actionDone || nextState.mouClient(client, central);
+                        action = "Moved client " + client + " to central " + central;
+                        //System.err.println(action);
+                        break;    			
+                    // Switch Client
+                    case 1:
+                        int client1 = rand.nextInt(clientsNumber), client2 = rand.nextInt(clientsNumber);
+                        actionDone = actionDone || nextState.swapClient(client1, client2);
+                        action = "Swaped client " + client1 + " for " + client2;
+                        //System.err.println(action);
+                        break;
+                    // Reset Central
+                    case 2:
+                        int centralRemoved = rand.nextInt(centralsNumber);
+                        actionDone = actionDone || nextState.resetCentral(centralRemoved);
+                        action = "Eliminat clients central" + centralRemoved;
+                        //System.err.println(action);
+                        retval.add(new Successor(action, nextState));
+                        break;
+                    // Default
+                    default:
+                        System.err.println("uooo you shouldn't be here... (error in sa successor function)");
+                        break;
+                    }
                 }
             }
             retval.add(new Successor(action, nextState));
