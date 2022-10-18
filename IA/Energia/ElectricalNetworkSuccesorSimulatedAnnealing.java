@@ -17,8 +17,8 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
     private static int swapCases;
     private static int resetCases;
 
-    private static int saDepth = 1;
-    private static int numberOfSuccessors = 1;
+    private static int saDepth = 10;
+    private static int numberOfSuccessors = 300;
 
     public List getSuccessors (Object state) {
 
@@ -44,7 +44,7 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
                 for (int j = 0; j < saDepth; ++j) {
                     int k = getRandomStep(totalCases);
                     //System.err.println("k is " + k);
-                    switch (k){
+                    switch (k) {
                     // Move Client
                     case 0:
                         int client = rand.nextInt(clientsNumber), central = rand.nextInt(centralsNumber);

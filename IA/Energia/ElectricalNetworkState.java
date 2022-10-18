@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 import java.util.*;
+
 import java.util.function.ObjDoubleConsumer;
 
 import javax.swing.text.html.HTMLDocument.Iterator;
@@ -76,17 +77,26 @@ public class ElectricalNetworkState {
 
         switch(method) {
             case 0:
-                generateInitialSolutionClosest();
+                generateInitialSolutionClosestFull();
                 break;
             case 1:
-                generateInitialSolution1();
+                generateInitialSolutionRandomGuaranteed(1);
                 break;
+            case 2:
+                    generateInitialSolutionRandomGuaranteed(getCentralsNumber()/2);
+                    break;
+            case 3:
+                    generateInitialSolutionRandom(1);
+                    break;
+            case 4:
+                    generateInitialSolutionRandom(getCentralsNumber()/2);
+                    break;
         }
 
         benefDynamic = getBenefit();
     }
 
-    private void generateInitialSolutionClosest() {
+    private void generateInitialSolutionClosestFull() {
         int tClients = getClientsNumber();
         int tCentrals = getCentralsNumber();
 
@@ -98,6 +108,7 @@ public class ElectricalNetworkState {
         Vector<Integer> clientsOrdenats = new Vector<Integer>();
         
         for (int i = 0; i < tClients; ++i) {
+            assignedClients[i] = -1;
             if (isGuaranteed(i)) 
                 clientsOrdenats.add(i);
         }
@@ -106,7 +117,6 @@ public class ElectricalNetworkState {
             if (!isGuaranteed(i)) 
                 clientsOrdenats.add(i);
         }
-
 
         // Assignació Clients
         for (Integer i : clientsOrdenats) {
@@ -132,6 +142,149 @@ public class ElectricalNetworkState {
         }
     }
 
+
+    private void generateInitialSolutionRandomGuaranteed(int maxTotal) {
+        int tClients = getClientsNumber();
+        int tCentrals = getCentralsNumber();
+
+        // Energia Centrals = Producció
+        for (int i = 0; i < tCentrals; ++i) {
+            leftPowerCentral[i] = centrals.get(i).getProduccion();
+        }
+
+        Vector<Integer> clientsOrdenats = new Vector<Integer>();
+        
+        for (int i = 0; i < tClients; ++i) {
+            assignedClients[i] = -1;
+            if (isGuaranteed(i)) 
+                clientsOrdenats.add(i);
+        }
+
+        Integer[] array = new Integer[getCentralsNumber()];
+
+        for (int i = 0; i < getCentralsNumber(); ++i) 
+            array[i] = i;
+
+        List<Integer> intList = Arrays.asList(array);
+
+        Collections.shuffle(intList);
+        
+        // Assignació Clients
+        for (Integer i : clientsOrdenats) {
+            int pos = 0;
+            int j = intList.get(pos);
+            double consumption = getRealConsumption(i, j);
+            Integer[] a = new Integer[maxTotal];
+            int total = 0;
+            ++pos;
+            while (total < maxTotal && pos < getCentralsNumber()) {
+                if (consumption <= leftPowerCentral[j]) {
+                    a[total] = j;
+                    ++total;
+                }
+                j = intList.get(pos);
+                consumption = getRealConsumption(i, j);
+                ++pos;
+            }
+
+            int closest = -1;
+            double minDistance = 10000;
+            for (int k = 0; k < total; ++k) {
+                double d = getDistance(i, a[k]);
+                if (d < minDistance) {
+                    minDistance = d;
+                    closest = a[k];
+                }
+            }
+            if (closest != -1)  {
+                assignedClients[i] = closest;
+                leftPowerCentral[closest] -= getRealConsumption(i, closest);;
+            } else {
+                generateInitialSolutionRandomGuaranteed(++maxTotal);
+            }
+
+            Collections.shuffle(intList);
+            //System.out.println("Assigned client " + i + " to central " + closest);
+        }
+    }
+
+
+    private void generateInitialSolutionRandom(int maxTotal) {
+        int tClients = getClientsNumber();
+        int tCentrals = getCentralsNumber();
+
+        // Energia Centrals = Producció
+        for (int i = 0; i < tCentrals; ++i) {
+            leftPowerCentral[i] = centrals.get(i).getProduccion();
+        }
+
+        Vector<Integer> clientsOrdenats = new Vector<Integer>();
+        
+        int totalGuaranteed = 0;
+
+        for (int i = 0; i < tClients; ++i) {
+            assignedClients[i] = -1;
+            if (isGuaranteed(i)) {
+                clientsOrdenats.add(i);
+                ++totalGuaranteed;
+            }
+        }
+
+        for (int i = 0; i < tClients; ++i) {
+            if (!isGuaranteed(i))
+                clientsOrdenats.add(i);
+        }
+
+        Integer[] array = new Integer[getCentralsNumber()];
+        
+        for (int i = 0; i < getCentralsNumber(); ++i) 
+            array[i] = i;
+
+        List<Integer> intList = Arrays.asList(array);
+
+        Collections.shuffle(intList);
+        
+        // Assignació Clients
+        for (int i = 0; i < clientsOrdenats.size(); ++i) {
+            int index = clientsOrdenats.get(i);
+            int pos = 0;
+            int j = intList.get(pos);
+            double consumption = getRealConsumption(index, j);
+            Integer[] a = new Integer[maxTotal];
+            int total = 0;
+            ++pos;
+            while (total < maxTotal && pos < getCentralsNumber()) {
+                if (consumption <= leftPowerCentral[j]) {
+                    a[total] = j;
+                    ++total;
+                }
+                j = intList.get(pos);
+                consumption = getRealConsumption(index, j);
+                ++pos;
+            }
+
+            int closest = -1;
+            double minDistance = 10000;
+            for (int k = 0; k < total; ++k) {
+                double d = getDistance(index, a[k]);
+                if (d < minDistance) {
+                    minDistance = d;
+                    closest = a[k];
+                }
+            }
+            if (closest != -1)  {
+                assignedClients[index] = closest;
+                leftPowerCentral[closest] -= getRealConsumption(index, closest);;
+            } else {
+                if (i < totalGuaranteed)
+                    generateInitialSolutionRandom(++maxTotal);
+            }
+
+            Collections.shuffle(intList);
+            //System.out.println("Assigned client " + i + " to central " + closest);
+        }
+    }
+
     private double powerLossCompensation(double d) {
         if (d <= 10) return 1;
         if (d <= 25) return 1 / 0.9;
@@ -153,57 +306,6 @@ public class ElectricalNetworkState {
     private double getDistance(Cliente cl, Central ce) {
         return getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
     }
-
-    private void generateInitialSolution1() {
-        int tClients = getClientsNumber();
-        int tCentrals = getCentralsNumber();
-
-        // Energia Centrals = Producció
-        for (int i = 0; i < tCentrals; ++i) {
-            leftPowerCentral[i] = centrals.get(i).getProduccion();
-        }
-
-        Vector<Integer> clientsOrdenats = new Vector<Integer>();
-        
-        for (int i = 0; i < tClients; ++i) {
-            if (isGuaranteed(i)) 
-                clientsOrdenats.add(i);
-        }
-
-        for (int i = 0; i < tClients; ++i) {
-            if (!isGuaranteed(i)) 
-                clientsOrdenats.add(i);
-        }
-
-
-        // Assignació Clients
-        for (Integer i : clientsOrdenats) {
-            Cliente cl = clients.get(i);
-            int closest = -1;
-            double minDistance = 10000;
-            double minConsumption = 10000;
-            for (int j = 0; j < tCentrals; ++j) {
-                Central ce = centrals.get(j);
-                double d = getDistance(cl, ce);
-
-                if (getRealConsumption(cl, ce) <= leftPowerCentral[j] && isGuaranteed(i)) {
-                    if (d < minDistance) {
-                        minDistance = d;
-                        closest = j;
-                        minConsumption = getRealConsumption(cl, ce);
-                    }
-                }
-            }
-            
-            assignedClients[i] = closest;
-            if (closest != -1)  {
-                leftPowerCentral[closest] -= minConsumption;
-            }
-
-            //System.out.println("Assigned client " + i + " to central " + closest);
-        }
-    }
-
 
     // ------------------------ Funcions auxiliars ---------------------
     public Clientes getClients(){
@@ -310,6 +412,7 @@ public class ElectricalNetworkState {
         return centrals.size();
     }
 
+    Random rand = new Random();
     /** Returns the benefit of the current state. Use getDynamicBenefit if possible. */
     public double getBenefit(){
         double benef = 0, costc = 0;
@@ -418,10 +521,16 @@ public class ElectricalNetworkState {
 
     private boolean isValidState() {
         for (int i = 0; i < getClientsNumber(); ++i) {
-            if (isGuaranteed(i) && assignedClients[i] == -1) return false;
+            if (isGuaranteed(i) && assignedClients[i] == -1) {
+                System.out.println("Client Sense Assignar");
+                return false;
+            }
         }
         for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (leftPowerCentral[i] < 0) return false;
+            if (leftPowerCentral[i] < 0) {
+                System.out.println("Central sense energia!");
+                return false;
+            }
         }
         return true;
     }
@@ -488,15 +597,15 @@ public class ElectricalNetworkState {
             //System.err.println("Benefici despres nova " + benefDynamic);
             
             if ((centralInUse(central) && !centralWasInUse) || (!centralInUse(central) && centralWasInUse)) {
-                System.err.println("Change 1");
-                benefDynamic += cost;
-                benefDynamic -= costCentral(central);
+                //System.err.println("Change 1");
+                //benefDynamic += cost;
+                //benefDynamic -= costCentral(central);
             }
             if (orCentral != -1) {
                 if ((centralInUse(orCentral) && !orCentralWasInUse) || (!centralInUse(orCentral) && orCentralWasInUse)) {
-                    System.err.println("Change 2");
-                    benefDynamic += orCost;
-                    benefDynamic -= costCentral(orCentral);
+                    //System.err.println("Change 2");
+                    //benefDynamic += orCost;
+                    //benefDynamic -= costCentral(orCentral);
                 }
             } else if (orCentral == -1) {
                 //System.err.println("Change 3");
@@ -539,6 +648,7 @@ public class ElectricalNetworkState {
                 benefDynamic -= oldC2;
                 benefDynamic += beneficiClient(client2);
             }
+
             return true;
         }   
         return false;
