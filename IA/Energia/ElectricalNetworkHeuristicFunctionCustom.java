@@ -2,10 +2,11 @@ package IA.Energia;
 
 import aima.search.framework.HeuristicFunction;
 
-public class ElectricalNetworkHeuristicFunction implements HeuristicFunction {
+public class ElectricalNetworkHeuristicFunctionCustom implements HeuristicFunction {
 
     public double getHeuristicValue(Object n){
-        double h = -((ElectricalNetworkState) n).getDynamicBenefit();
+        ElectricalNetworkState state = (ElectricalNetworkState) n;
+        double h = state.getAverageDistanceToCentrals();
         //double h = ((ElectricalNetworkState) n).getAverageDistanceToCentrals();
         //System.err.println("Heuristic result is : " + h);
         return h;

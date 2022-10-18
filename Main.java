@@ -115,7 +115,7 @@ public class Main {
         else                     System.out.println("ERROR: No search algorithm");
 		
 		if      (heuristic == 0) System.out.println("heuristica: Benefit");
-		else if (heuristic == 1) System.out.println("heuristica: 1");
+		else if (heuristic == 1) System.out.println("heuristica: Custom");
         else                     System.out.println("ERROR: No heuristic");
 		
 		if      (generationMethod == 0) System.out.println("Generation method: [0] Everyone to closest");
@@ -139,7 +139,7 @@ public class Main {
         System.out.println ("gclient <N>              -- change % of clients with guaranteed supply ");
 		System.out.println ("algo <I>                 -- change search algorithm ([0]- Hill climbing, [1]- Simulated annealing)");
 		System.out.println ("genmethod <I>            -- change generation method ([0]- Closest, [1]- )");
-		System.out.println ("heur <I>                 -- change heuristic ([0]- , [1]- )");
+		System.out.println ("heur <I>                 -- change heuristic ([0]- Benefici, [1]- Custom)");
 		System.out.println ("seed <I>                 -- change the seed");
 		System.out.println ("print                    -- see current values");
 		System.out.println ("cmds                     -- see commands");
@@ -151,19 +151,22 @@ public class Main {
     private static boolean run(ElectricalNetworkState networkstate, int algorithm, int heuristic) {
         boolean error = false;
         
-        if      (algorithm == 0 &&  heuristic == 0)	error = ElectricalNetwork_HillClimbing_Benefici(networkstate);
-    	else if (algorithm == 1 &&  heuristic == 0)	error = ElectricalNetwork_SimulatedAnnealing_Benefici(networkstate);
+        if      (algorithm == 0)	error = ElectricalNetwork_HillClimbing(networkstate);
+    	else if (algorithm == 1)	error = ElectricalNetwork_SimulatedAnnealing(networkstate);
 
         return error;
     }
 
-	private static boolean ElectricalNetwork_HillClimbing_Benefici(ElectricalNetworkState networkState) {
-        System.out.println ("Solution using Hill Climbing + Benefici: ");
+	private static boolean ElectricalNetwork_HillClimbing(ElectricalNetworkState networkState) {
+        if 		(heuristic == 0) System.out.println ("Solution using Hill Climbing + Benefici: ");
+		else if (heuristic == 1) System.out.println ("Solution using Hill Climbing + Custom: ");
 		try {
 			networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
-			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
+			Problem problem;
+			if 		(heuristic == 0) problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionBenefit());
+			else    				 problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionCustom());
 			Search search = new HillClimbingSearch();
 			SearchAgent agent = new SearchAgent (problem, search);
 			
@@ -179,13 +182,16 @@ public class Main {
 		}
     }
 
-    private static boolean ElectricalNetwork_SimulatedAnnealing_Benefici(ElectricalNetworkState networkState) {
-		System.out.println ("Solution using Simulated Annealing + Benefici: ");
+    private static boolean ElectricalNetwork_SimulatedAnnealing(ElectricalNetworkState networkState) {
+		if 		(heuristic == 0) System.out.println ("Solution using Simulated Annealing + Benefici: ");
+		else if (heuristic == 1) System.out.println ("Solution using Simulated Annealing + Custom: ");
 		try {
 			networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
-			Problem problem = new Problem (networkState, new ElectricalNetworkSuccesorSimulatedAnnealing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunction());
+			Problem problem;
+			if 		(heuristic == 0) problem = new Problem (networkState, new ElectricalNetworkSuccesorSimulatedAnnealing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionBenefit());
+			else    				 problem = new Problem (networkState, new ElectricalNetworkSuccesorSimulatedAnnealing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionCustom());
 			Search search = new SimulatedAnnealingSearch();
 			SearchAgent agent = new SearchAgent (problem, search);
 			
@@ -200,5 +206,4 @@ public class Main {
 			return false;
 		}
 	}
-
 }

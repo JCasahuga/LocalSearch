@@ -18,7 +18,7 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
     private static int resetCases;
 
     private static int saDepth = 1;
-    private static int numberOfSuccessors = 10;
+    private static int numberOfSuccessors = 50;
 
     public List getSuccessors (Object state) {
 

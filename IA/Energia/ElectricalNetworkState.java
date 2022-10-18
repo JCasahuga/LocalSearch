@@ -535,6 +535,30 @@ public class ElectricalNetworkState {
         return true;
     }
 
+    public int numberOfXGClients() {
+        int count = 0;
+        for (Cliente c : clients) {
+            if (c.getTipo() == CLIENTEXG) ++count;
+        }
+        return count;
+    }
+
+    public int numberOfMGClients() {
+        int count = 0;
+        for (Cliente c : clients) {
+            if (c.getTipo() == CLIENTEMG) ++count;
+        }
+        return count;
+    }
+
+    public int numberOfGClients() {
+        int count = 0;
+        for (Cliente c : clients) {
+            if (c.getTipo() == CLIENTEG) ++count;
+        }
+        return count;
+    }
+
     private boolean canMove(int client, int central)
     {
         if (assignedClients[client] == central) return false;
