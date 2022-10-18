@@ -114,12 +114,15 @@ public class Main {
 		else if (algorithm == 1) System.out.println("Search algorithm: simulated annealing");
         else                     System.out.println("ERROR: No search algorithm");
 		
-		if      (heuristic == 0) System.out.println("heuristica: 0");
+		if      (heuristic == 0) System.out.println("heuristica: Benefit");
 		else if (heuristic == 1) System.out.println("heuristica: 1");
         else                     System.out.println("ERROR: No heuristic");
 		
-		if      (generationMethod == 0) System.out.println("Generation method: 0");
-		else if (generationMethod == 1) System.out.println("Generation method: 1");
+		if      (generationMethod == 0) System.out.println("Generation method: [0] Everyone to closest");
+		else if (generationMethod == 1) System.out.println("Generation method: [1] Random amb garantits (1)");
+		else if (generationMethod == 2) System.out.println("Generation method: [2] Random amb garantits (centrals/2)");
+		else if (generationMethod == 3) System.out.println("Generation method: [3] Random (1)");
+		else if (generationMethod == 4) System.out.println("Generation method: [4] Random (centrals/2)");
         else                     System.out.println("ERROR: No generation method");
 		
 		System.out.println("Seed: " + seed);

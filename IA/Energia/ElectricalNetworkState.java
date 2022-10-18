@@ -83,14 +83,14 @@ public class ElectricalNetworkState {
                 generateInitialSolutionRandomGuaranteed(1);
                 break;
             case 2:
-                    generateInitialSolutionRandomGuaranteed(getCentralsNumber()/2);
-                    break;
+                generateInitialSolutionRandomGuaranteed(getCentralsNumber()/2);
+                break;
             case 3:
-                    generateInitialSolutionRandom(1);
-                    break;
+                generateInitialSolutionRandom(1);
+                break;
             case 4:
-                    generateInitialSolutionRandom(getCentralsNumber()/2);
-                    break;
+                generateInitialSolutionRandom(getCentralsNumber()/2);
+                break;
         }
 
         benefDynamic = getBenefit();
