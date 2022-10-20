@@ -14,6 +14,7 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
     	ElectricalNetworkState networkState = new ElectricalNetworkState ((ElectricalNetworkState) state);
 		retval.add(new Successor("Mateix estat", networkState));
 
+		System.out.println(networkState.getDynamicBenefit());
 	
 		int totalClients = networkState.getClientsNumber();
 		int totalCentrals = networkState.getCentralsNumber();

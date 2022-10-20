@@ -41,6 +41,7 @@ public class ElectricalNetworkState {
     private int[] assignedClients; 
     private double[] leftPowerCentral;
     private double benefDynamic = 0;
+    private double assignedCDynamic = 0;
 
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
@@ -57,6 +58,7 @@ public class ElectricalNetworkState {
         assignedClients = Arrays.copyOf(networkState.getAssignedClients(), getClientsNumber());
         leftPowerCentral = Arrays.copyOf(networkState.getLeftPowerCentral(), getCentralsNumber());
         benefDynamic = networkState.getDynamicBenefit();
+        assignedCDynamic = networkState.getDynamicAssignedC();
     }
 
     // public ElectricalNetworkState(Clientes clnts, Centrales ctrls, int[] assigClt, double[] lfPwCtrl) {
@@ -94,6 +96,7 @@ public class ElectricalNetworkState {
         }
 
         benefDynamic = getBenefit();
+        assignedCDynamic = numberOfAssignedClients();
     }
 
     private void generateInitialSolutionClosestFull() {
@@ -299,12 +302,26 @@ public class ElectricalNetworkState {
         return Math.sqrt(distX*distX + distY*distY);
     }
 
+    private double getDistancePow(int x1, int y1, int x2, int y2) {
+        int distX = x1 - x2;
+        int distY = y1 - y2;
+        return distX*distX + distY*distY;
+    }
+    
+    private double getDistancePow(int cl, int ce) {
+        return getDistancePow(getClient(cl), getCentral(ce));
+    }
+
     private double getDistance(int cl, int ce) {
         return getDistance(getClient(cl), getCentral(ce));
     }
 
     private double getDistance(Cliente cl, Central ce) {
         return getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
+    }
+
+    private double getDistancePow(Cliente cl, Central ce) {
+        return getDistancePow(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
     }
 
     // ------------------------ Funcions auxiliars ---------------------
@@ -322,6 +339,14 @@ public class ElectricalNetworkState {
 
     public double[] getLeftPowerCentral(){
         return leftPowerCentral;
+    }
+
+    public double getTotalLeftPowerCentral(){
+        double c = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            c += leftPowerCentral[i];
+        }
+        return c;
     }
 
     public void printState(boolean finalState, double time, boolean printSteps, SearchAgent agent, int algorithm)
@@ -367,10 +392,23 @@ public class ElectricalNetworkState {
                 ++count;
             }
         }
+        if (count == 0) return 1000000;
         return sum/count;
     }
 
-    private int numberOfAssignedClients() {
+    public double getPowAverageDistanceToCentrals() {
+        double sum = 0, count = 0;
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            if (assignedClients[i] != -1) {
+                sum += getDistancePow(i, assignedClients[i]);
+                ++count;
+            }
+        }
+        return sum/count;
+    }
+
+
+    public int numberOfAssignedClients() {
         int count = 0;
         for (int i : assignedClients) if (i != -1) ++count;
         return count;
@@ -428,6 +466,10 @@ public class ElectricalNetworkState {
     /** Returns the current state's benefit (it is autoupdated on each "move") */
     public double getDynamicBenefit() {
         return benefDynamic;
+    }
+
+    public double getDynamicAssignedC() {
+        return assignedCDynamic;
     }
 
     private double costCentral(int central){
@@ -543,6 +585,14 @@ public class ElectricalNetworkState {
         return count;
     }
 
+    public int numberOfXGClientsUsed() {
+        int count = 0;
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            if (clients.get(i).getTipo() == CLIENTEXG && assignedClients[i] != -1) ++count;
+        }
+        return count;
+    }
+
     public int numberOfMGClients() {
         int count = 0;
         for (Cliente c : clients) {
@@ -551,10 +601,50 @@ public class ElectricalNetworkState {
         return count;
     }
 
+    public int numberOfMGlientsUsed() {
+        int count = 0;
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            if (clients.get(i).getTipo() == CLIENTEMG && assignedClients[i] != -1) ++count;
+        }
+        return count;
+    }
+
     public int numberOfGClients() {
         int count = 0;
         for (Cliente c : clients) {
             if (c.getTipo() == CLIENTEG) ++count;
+        }
+        return count;
+    }
+
+    public int numberOfGClientsUsed() {
+        int count = 0;
+        for (int i = 0; i < getClientsNumber(); ++i) {
+            if (clients.get(i).getTipo() == CLIENTEG && assignedClients[i] != -1) ++count;
+        }
+        return count;
+    }
+
+    public int numberOfACentralsUsed() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (centralInUse(i) && getCentral(i).getTipo() == CENTRALA) ++count;
+        }
+        return count;
+    }
+
+    public int numberOfBCentralsUsed() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (centralInUse(i) && getCentral(i).getTipo() == CENTRALB) ++count;
+        }
+        return count;
+    }
+
+    public int numberOfCCentralsUsed() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (centralInUse(i) && getCentral(i).getTipo() == CENTRALC) ++count;
         }
         return count;
     }
@@ -637,6 +727,9 @@ public class ElectricalNetworkState {
                 benefDynamic += beneficiClient(client);
             }
 
+            if (central != -1 && orCentral == -1) ++assignedCDynamic;
+            if (central == -1 && orCentral != -1) --assignedCDynamic;
+
             /*
             double dynBen = benefDynamic;
             double nouBen = getBenefit();
@@ -672,6 +765,9 @@ public class ElectricalNetworkState {
                 benefDynamic -= oldC2;
                 benefDynamic += beneficiClient(client2);
             }
+
+            if (central1 == -1 && central2 == -1) --assignedCDynamic;
+            if (central1 != -1 && central2 != -1) ++assignedCDynamic;
 
             return true;
         }   
