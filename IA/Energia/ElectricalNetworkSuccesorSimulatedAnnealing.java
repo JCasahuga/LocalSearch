@@ -27,7 +27,7 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
         retval.add(new Successor("Mateix estat", networkState));
     	
         int clientsNumber = networkState.getClientsNumber(), centralsNumber = networkState.getCentralsNumber();
-        moveCases = 400;
+        moveCases = 300;
         swapCases = 700;
         resetCases = 10;         // Customized value for enhancing the chances
         int totalCases = moveCases + swapCases + resetCases;
@@ -48,15 +48,20 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
                     // Move Client
                     case 0:
                         int client = rand.nextInt(clientsNumber), central = rand.nextInt(centralsNumber);
-                        actionDone = actionDone || nextState.mouClient(client, central);
-                        action = "Moved client " + client + " to central " + central;
+                        if (networkState.canMove(client, central)) {
+                            actionDone = actionDone || nextState.mouClient(client, central);
+                            action = "Moved client " + client + " to central " + central;
+                        }
                         //System.err.println(action);
-                        break;    			
+                        break;
                     // Switch Client
                     case 1:
                         int client1 = rand.nextInt(clientsNumber), client2 = rand.nextInt(clientsNumber);
-                        actionDone = actionDone || nextState.swapClient(client1, client2);
-                        action = "Swaped client " + client1 + " for " + client2;
+                        if (networkState.canSwap(client1, networkState.getCentralAssignedToClient(client1),
+                                                client2, networkState.getCentralAssignedToClient(client2))) {
+                            actionDone = actionDone || nextState.swapClient(client1, client2);
+                            action = "Swaped client " + client1 + " for " + client2;
+                        }
                         //System.err.println(action);
                         break;
                     // Reset Central
