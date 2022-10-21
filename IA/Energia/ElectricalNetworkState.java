@@ -1,23 +1,13 @@
 package IA.Energia;
 
-import java.lang.reflect.Array;
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Vector;
 import java.util.*;
 
-import java.util.function.ObjDoubleConsumer;
-
-import javax.swing.text.html.HTMLDocument.Iterator;
-
 import java.lang.Math;
 
-import IA.Energia.*;
-import aima.datastructures.PriorityQueue;
 import aima.search.framework.SearchAgent;
 
 public class ElectricalNetworkState {
@@ -558,10 +548,6 @@ public class ElectricalNetworkState {
 
     private Central getCentral(int central) {
         return centrals.get(central);
-    }
-
-    private double getConsumption(int client) {
-        return getClient(client).getConsumo();
     }
 
     private int getContract(int client) {

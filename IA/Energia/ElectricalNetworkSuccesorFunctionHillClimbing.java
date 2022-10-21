@@ -1,7 +1,5 @@
 package IA.Energia;
 
-import IA.Energia.*;
-
 import aima.search.framework.SuccessorFunction;
 import aima.search.framework.Successor;
 import java.util.ArrayList;
@@ -17,8 +15,6 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		int totalClients = networkState.getClientsNumber();
 		int totalCentrals = networkState.getCentralsNumber();
 
-		System.out.println(networkState.getDynamicBenefit());
-		
 		String action;
 		boolean actionDone = false;
 		for (int i = 0; i < totalClients; ++i) {
@@ -32,15 +28,6 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 			}
 		}
 		
-		for (int i = 0; i < totalCentrals; ++i) {
-			if (networkState.centralInUse(i)) {
-				ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
-				actionDone = new_state.resetCentral(i);
-				action = "Eliminat clients central" + i;
-				retval.add(new Successor(action, new_state));
-			}
-		}
-
 		for (int i = 0; i < totalClients; ++i) {
 			for (int j = i+1; j < totalClients; ++j) {
 				if (networkState.canSwap(i, networkState.getCentralAssignedToClient(i),
@@ -53,6 +40,16 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 				}
 			}
 		}
+
+		for (int i = 0; i < totalCentrals; ++i) {
+			if (networkState.centralInUse(i)) {
+				ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
+				actionDone = new_state.resetCentral(i);
+				action = "Eliminat clients central" + i;
+				retval.add(new Successor(action, new_state));
+			}
+		}
+
 		return retval;
 	}
 }

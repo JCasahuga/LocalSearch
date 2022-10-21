@@ -1,17 +1,13 @@
 package IA.Energia;
 
-import IA.Energia.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 
 public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFunction {
-		    
 
     private static int moveCases;
     private static int swapCases;
@@ -27,9 +23,9 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
         retval.add(new Successor("Mateix estat", networkState));
     	
         int clientsNumber = networkState.getClientsNumber(), centralsNumber = networkState.getCentralsNumber();
-        moveCases = 300;
-        swapCases = 700;
-        resetCases = 10;         // Customized value for enhancing the chances
+        moveCases = 7500;
+        swapCases = 2900;
+        resetCases = 100;
         int totalCases = moveCases + swapCases + resetCases;
 
     	String action = "ERROR";
