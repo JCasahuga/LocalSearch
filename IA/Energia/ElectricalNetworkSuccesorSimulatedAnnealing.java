@@ -27,9 +27,9 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
         retval.add(new Successor("Mateix estat", networkState));
     	
         int clientsNumber = networkState.getClientsNumber(), centralsNumber = networkState.getCentralsNumber();
-        moveCases = clientsNumber * centralsNumber;
-        swapCases = (clientsNumber * clientsNumber)/2;
-        resetCases = centralsNumber * centralsNumber;         // Customized value for enhancing the chances
+        moveCases = 400;
+        swapCases = 700;
+        resetCases = 10;         // Customized value for enhancing the chances
         int totalCases = moveCases + swapCases + resetCases;
 
     	String action = "ERROR";

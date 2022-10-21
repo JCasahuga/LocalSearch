@@ -9,20 +9,25 @@ public class ElectricalNetworkHeuristicFunctionCustom implements HeuristicFuncti
         
         //double h = 0;
 
-        double b = state.getDynamicBenefit();
+        //double b = state.getDynamicBenefit();
 
-        double d = state.getAverageDistanceToCentrals();
+        double d = state.getDynamicDistance();
         d *= d;
-        //double h = d * d;
-        //double p = state.getTotalLeftPowerCentral() * 25;
-        double a = state.numberOfAssignedClients();
-        a *= a;
-        double h = d - b - a;
-        //System.err.println("Potencia " + p);
+        // //double h = d * d;
+        double p = state.getDynamicPowerLeft();
+        p *= p;
+        // double a = state.numberOfAssignedClients();
+        //double a = state.getDynamicAssignedC();
+        //if (a !=  state.numberOfAssignedClients()) System.out.println(a + " " + state.numberOfAssignedClients());
+        //a *= a;
+        // double h = d - b - a;
+        //double h = d - b ;
+        double h = d - p;
+        // System.err.println("Potencia " + p);
         // System.err.println("Distance " + d);
         // System.err.println("Persones " + a);
         // System.err.println("Benefici " + b);
-        //  System.err.println();
+        // System.err.println();
 
         //h -= state.numberOfGClientsUsed() * 4;
         //h -= state.numberOfMGlientsUsed() * 2;

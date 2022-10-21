@@ -10,6 +10,7 @@ import java.util.List;
 public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorFunction{
 
     public List getSuccessors(Object state){
+		double time = System.currentTimeMillis();
 		ArrayList <Successor> retval = new ArrayList<>();
     	ElectricalNetworkState networkState = new ElectricalNetworkState ((ElectricalNetworkState) state);
 		retval.add(new Successor("Mateix estat", networkState));
@@ -35,14 +36,12 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 				retval.add(new Successor(action, new_state));
 			}
 		}
-
 		for (int i = 0; i < totalCentrals; ++i) {
 			ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
 			actionDone = new_state.resetCentral(i);
 			action = "Eliminat clients central" + i;
 			retval.add(new Successor(action, new_state));
 		}
-
 		for (int i = 0; i < totalClients; ++i) {
 			for (int j = i+1; j < totalClients; ++j) {
 				ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
@@ -52,7 +51,8 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 				retval.add(new Successor(action, new_state));
 			}
 		}
-
+		time = System.currentTimeMillis() - time;
+		System.out.println(time);
 		return retval;
 	}
 }
