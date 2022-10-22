@@ -13,8 +13,8 @@ import java.util.Scanner;
 
 public class Main {
 
-    static private int[] numberOfCentrals = new int[]{25, 50, 125};           // Centrals type A, B, C (?)
-    static private int numberOfClients = 500;                              // Number of clients
+    static private int[] numberOfCentrals = new int[]{5, 10, 25};           // Centrals type A, B, C (?)
+    static private int numberOfClients = 1000;                              // Number of clients
     static private double[] typeOfClients = new double[]{0.25, 0.3, 0.45};  // Client type XG, MG, G (?)
     static private double propGuaranteed = 0.75;                            // % of clients with guaranteed supply
     static private int algorithm = 0;                                       // (0) - Hill Climbling, (1) - Simulated Annealing
@@ -45,6 +45,7 @@ public class Main {
                     // TODO: Executar segons params
 					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
 					networkState.generateInitialSolution(generationMethod);
+					networkState.heuristic = heuristic;
 					run(networkState, algorithm, heuristic);
 					System.out.println("----------- Finished ----------");
     				break;
@@ -150,7 +151,6 @@ public class Main {
 
     private static boolean run(ElectricalNetworkState networkstate, int algorithm, int heuristic) {
         boolean error = false;
-        
         if      (algorithm == 0)	error = ElectricalNetwork_HillClimbing(networkstate);
     	else if (algorithm == 1)	error = ElectricalNetwork_SimulatedAnnealing(networkstate);
 
@@ -167,7 +167,8 @@ public class Main {
 			
 			Problem problem;
 			if 		(heuristic == 0) problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionBenefit());
-			else    				 problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionCustom());
+			else    if (heuristic == 1)				 problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionCustom());
+			else    				 problem = new Problem (networkState, new ElectricalNetworkSuccesorFunctionHillClimbing(), new ElectricalNetworkGoalTest(), new ElectricalNetworkHeuristicFunctionNotGuaraented());
 			Search search = new HillClimbingSearch();
 			SearchAgent agent = new SearchAgent (problem, search);
 			

@@ -44,7 +44,7 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
                     // Move Client
                     case 0:
                         int client = rand.nextInt(clientsNumber), central = rand.nextInt(centralsNumber);
-                        if (networkState.canMove(client, central)) {
+                        if (networkState.canMove(client, central)  || networkState.heuristic == 2) {
                             actionDone = actionDone || nextState.mouClient(client, central);
                             action = "Moved client " + client + " to central " + central;
                         }
@@ -54,7 +54,7 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
                     case 1:
                         int client1 = rand.nextInt(clientsNumber), client2 = rand.nextInt(clientsNumber);
                         if (networkState.canSwap(client1, networkState.getCentralAssignedToClient(client1),
-                                                client2, networkState.getCentralAssignedToClient(client2))) {
+                                                client2, networkState.getCentralAssignedToClient(client2))  || networkState.heuristic == 2) {
                             actionDone = actionDone || nextState.swapClient(client1, client2);
                             action = "Swaped client " + client1 + " for " + client2;
                         }

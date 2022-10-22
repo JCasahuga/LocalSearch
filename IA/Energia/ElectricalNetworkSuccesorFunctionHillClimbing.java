@@ -11,7 +11,6 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		ArrayList <Successor> retval = new ArrayList<>();
     	ElectricalNetworkState networkState = new ElectricalNetworkState ((ElectricalNetworkState) state);
 		retval.add(new Successor("Mateix estat", networkState));
-	
 		int totalClients = networkState.getClientsNumber();
 		int totalCentrals = networkState.getCentralsNumber();
 
@@ -19,7 +18,7 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		boolean actionDone = false;
 		for (int i = 0; i < totalClients; ++i) {
 			for (int j = -1; j < totalCentrals; ++j) {
-				if (networkState.canMove(i, j)) {
+				if (networkState.canMove(i, j) || networkState.heuristic == 2) {
 					ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
 					actionDone = new_state.mouClient(i, j);
 					action = "Moved client " + i + " to central " + j;
@@ -31,7 +30,8 @@ public class ElectricalNetworkSuccesorFunctionHillClimbing implements SuccessorF
 		for (int i = 0; i < totalClients; ++i) {
 			for (int j = i+1; j < totalClients; ++j) {
 				if (networkState.canSwap(i, networkState.getCentralAssignedToClient(i),
-										j, networkState.getCentralAssignedToClient(j))) 
+										j, networkState.getCentralAssignedToClient(j))
+										|| networkState.heuristic == 2) 
 				{
 					ElectricalNetworkState new_state = new ElectricalNetworkState(networkState);
 					actionDone = new_state.swapClient(i, j);

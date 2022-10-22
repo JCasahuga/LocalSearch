@@ -24,6 +24,9 @@ public class ElectricalNetworkState {
     public static final int GARANTIZADO = 0;
     public static final int NOGARANTIZADO = 1;
 
+    public int genMethod = 0;
+    public int heuristic = 0;
+
     // Atributtes
     private Clientes clients;
     private Centrales centrals;
@@ -34,6 +37,8 @@ public class ElectricalNetworkState {
     private double assignedCDynamic = 0;
     private double distanceDynamic = 0;
     private double powerLeftDynamic = 0;
+    private double guaranteedNotAssigned = 0;
+    private double totalGuaranteed = 0;
 
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
@@ -53,6 +58,8 @@ public class ElectricalNetworkState {
         assignedCDynamic = networkState.getDynamicAssignedC();
         powerLeftDynamic = networkState.getDynamicPowerLeft();
         distanceDynamic = networkState.getDynamicDistance();
+        guaranteedNotAssigned = networkState.getGuaranteedNotAssigned();
+        totalGuaranteed = networkState.getTotalGuaranteed();
     }
 
     // public ElectricalNetworkState(Clientes clnts, Centrales ctrls, int[] assigClt, double[] lfPwCtrl) {
@@ -74,6 +81,7 @@ public class ElectricalNetworkState {
     {
         assignedClients = new int[clients.size()];
         leftPowerCentral = new double[centrals.size()];
+        genMethod = method;
 
         switch(method) {
             case 0:
@@ -91,12 +99,29 @@ public class ElectricalNetworkState {
             case 4:
                 generateInitialSolutionRandom(getCentralsNumber()/2);
                 break;
+            case 5:
+                generateEmpty();
+                break;
         }
-
         benefDynamic = getBenefit();
         distanceDynamic = getDistanceToCentrals();
         assignedCDynamic = numberOfAssignedClients();
         powerLeftDynamic = getTotalLeftPowerCentral();
+    }
+
+    private void generateEmpty() {
+        int tClients = getClientsNumber();
+        int tCentrals = getCentralsNumber();
+
+        for (int i = 0; i < tCentrals; ++i) {
+            leftPowerCentral[i] = centrals.get(i).getProduccion();
+        }
+        for (int i = 0; i < tClients; ++i) {
+            if (isGuaranteed(i)) ++guaranteedNotAssigned;
+            assignedClients[i] = -1;
+        }
+        totalGuaranteed = guaranteedNotAssigned;
+        System.out.println(totalGuaranteed);
     }
 
     private void generateInitialSolutionClosestFull() {
@@ -112,8 +137,10 @@ public class ElectricalNetworkState {
         
         for (int i = 0; i < tClients; ++i) {
             assignedClients[i] = -1;
-            if (isGuaranteed(i)) 
+            if (isGuaranteed(i)) {
                 clientsOrdenats.add(i);
+                ++totalGuaranteed;
+            }
         }
 
         for (int i = 0; i < tClients; ++i) {
@@ -140,6 +167,8 @@ public class ElectricalNetworkState {
             assignedClients[i] = closest;
             if (closest != -1)  {
                 leftPowerCentral[closest] -= minConsumption;
+            } else {
+                if (isGuaranteed(i)) ++guaranteedNotAssigned;
             }
             //System.out.println("Assigned client " + i + " to central " + closest);
         }
@@ -159,8 +188,10 @@ public class ElectricalNetworkState {
         
         for (int i = 0; i < tClients; ++i) {
             assignedClients[i] = -1;
-            if (isGuaranteed(i)) 
+            if (isGuaranteed(i)) {
                 clientsOrdenats.add(i);
+                ++totalGuaranteed;
+            }
         }
 
         Integer[] array = new Integer[getCentralsNumber()];
@@ -479,6 +510,10 @@ public class ElectricalNetworkState {
         return benef-costc;
     }
 
+    public double getTotalGuaranteed() {
+        return totalGuaranteed;
+    }
+
     /** Returns the current state's benefit (it is autoupdated on each "move") */
     public double getDynamicBenefit() {
         return benefDynamic;
@@ -486,6 +521,10 @@ public class ElectricalNetworkState {
 
     public double getDynamicAssignedC() {
         return assignedCDynamic;
+    }
+
+    public double getGuaranteedNotAssigned() {
+        return guaranteedNotAssigned;
     }
 
     public double getDynamicDistance() {
@@ -517,7 +556,7 @@ public class ElectricalNetworkState {
             case CLIENTEXG:
                 if(c.getContrato() == GARANTIZADO) {
                     if (assignedClients[client] != -1) return consumClient*400;
-                    return -1000000;
+                    return -10000;
                 }
                 if (assignedClients[client] != -1) return consumClient*300;
                 return -consumClient*50;
@@ -525,7 +564,7 @@ public class ElectricalNetworkState {
             case CLIENTEMG:
                 if(c.getContrato() == GARANTIZADO) {
                     if (assignedClients[client] != -1) return consumClient*500;
-                    return -1000000;
+                    return -10000;
                 }
                 if (assignedClients[client] != -1) return consumClient*400;
                 return -consumClient*50;
@@ -533,7 +572,7 @@ public class ElectricalNetworkState {
             case CLIENTEG:
                 if(c.getContrato() == GARANTIZADO) {
                     if (assignedClients[client] != -1) return consumClient*600;
-                    return -1000000;
+                    return -10000;
                 }
                 if (assignedClients[client] != -1) return consumClient*500;
                 return -consumClient*50;
@@ -580,7 +619,7 @@ public class ElectricalNetworkState {
     private boolean isValidState() {
         for (int i = 0; i < getClientsNumber(); ++i) {
             if (isGuaranteed(i) && assignedClients[i] == -1) {
-                System.out.println("Client Sense Assignar");
+                System.out.println("Client Sense Assignar " + guaranteedNotAssigned);
                 return false;
             }
         }
@@ -711,9 +750,16 @@ public class ElectricalNetworkState {
             assignedClients[client] = central;
             updateLeftPower(central, 0, getRealConsumption(client, assignedClients[client]));
             
-            if (orCentral == -1) {
-                benefDynamic -= orClient;
-                benefDynamic += beneficiClient(client);
+            benefDynamic -= orClient;
+            benefDynamic += beneficiClient(client);
+
+            if (isGuaranteed(client)) {
+                if (orCentral == -1 && central != -1) {
+                    --guaranteedNotAssigned;
+                }
+                if (orCentral != -1 && central == -1) {
+                    ++guaranteedNotAssigned;
+                } 
             }
 
             if (central != -1 && orCentral == -1) ++assignedCDynamic;
@@ -735,7 +781,6 @@ public class ElectricalNetworkState {
 
             distanceDynamic -= getDistance(client1, central1);
             distanceDynamic += getDistance(client1, central2);
-
             distanceDynamic -= getDistance(client2, central2);
             distanceDynamic += getDistance(client2, central1);
 
@@ -747,11 +792,27 @@ public class ElectricalNetworkState {
             if(central1 != -1)
                 updateLeftPower(central1, getRealConsumption(client1, central1), getRealConsumption(client2, central1));
         
-            if (assignedClients[client1] != assignedClients[client2] && (assignedClients[client1] == -1 || assignedClients[client2] == -1) ) {
-                benefDynamic -= oldC1;
-                benefDynamic += beneficiClient(client1);
-                benefDynamic -= oldC2;
-                benefDynamic += beneficiClient(client2);
+            benefDynamic -= oldC1;
+            benefDynamic += beneficiClient(client1);
+            benefDynamic -= oldC2;
+            benefDynamic += beneficiClient(client2);
+
+            if (isGuaranteed(client1)) {
+                if (central1 == -1 && central2 != -1) {
+                    --guaranteedNotAssigned;
+                }
+                if (central1 != -1 && central2 == -1) {
+                    ++guaranteedNotAssigned;
+                }
+            }
+
+            if (isGuaranteed(client2)) {
+                if (central2 == -1 && central1 != -1) {
+                    --guaranteedNotAssigned;
+                }
+                if (central2 != -1 && central1 == -1) {
+                    ++guaranteedNotAssigned;
+                }
             }
 
             return true;
@@ -768,6 +829,8 @@ public class ElectricalNetworkState {
                 distanceDynamic -= getDistance(i, central);
                 distanceDynamic += getDistance(i, -1);
                 leftPowerCentral[central] = 0;
+
+                if (isGuaranteed(i)) ++guaranteedNotAssigned;
             }
         }
         return true;
