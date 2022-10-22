@@ -396,6 +396,9 @@ public class ElectricalNetworkState {
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
         System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
+        System.out.println("A Centrals Used: " + aCentralsOcupation() + "/" + aCentrals());
+        System.out.println("B Centrals Used: " + bCentralsOcupation() + "/" + bCentrals());
+        System.out.println("C Centrals Used: " + cCentralsOcupation() + "/" + cCentrals());
         System.out.println ("Nombre de clients assignats  " + numberOfAssignedClients() + " / " + getClientsNumber());
         System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
@@ -470,21 +473,126 @@ public class ElectricalNetworkState {
     private String getOccupationDistribution() {
         //String[] occupation = new String[10];
         int[] count = new int[10];
+        int t = 0;
+        double total = 0;
         //System.err.println("Getting occupation dist:");
         for (int i = 0; i < getCentralsNumber(); ++i) {
-            double production = getCentral(i).getProduccion();
-            //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
-            int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
-            //System.err.println(index);
-            count[index]++;
+            if (getCentral(i).getTipo() == CENTRALB) {
+                double production = getCentral(i).getProduccion();
+                //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
+                int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
+                total += (production-leftPowerCentral[i])/production;
+                //System.err.println(index);
+                count[index]++;
+                ++t;
+            }
         }
+        total *= 100;
+        total /= t;
+        int[] countReversed = new int[10];
+        for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
+        System.out.println("Centrals A " + Arrays.toString(countReversed) + " " + total);
+        count = new int[10];
+        total = 0;
+        t = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALB) {
+                double production = getCentral(i).getProduccion();
+                //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
+                int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
+                //System.err.println(index);
+                count[index]++;
+                total += (production-leftPowerCentral[i])/production;
+                ++t;
+            }
+        }
+        total *= 100;
+        total /= t;
+        countReversed = new int[10];
+        for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
+        System.out.println("Centrals B " + Arrays.toString(countReversed) + " " + total);
+        count = new int[10];
+        total = 0;
+        t = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALC) {
+                double production = getCentral(i).getProduccion();
+                //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
+                int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
+                //System.err.println(index);
+                count[index]++;
+                total += (production-leftPowerCentral[i])/production;
+                ++t;
+            }
+        }
+        total *= 100;
+        total /= t;
+
+
+        countReversed = new int[10];
+        for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
+        System.out.println("Centrals C " + Arrays.toString(countReversed) + " " + total);
         // for (int i = 0; i < 10; ++i) {
         //     occupation[i] = String.valueOf((double)count[i]/(double)getCentralsNumber());
         //     //System.err.println(occupation[i] + " - " + count[i]);
         // }
-        int[] countReversed = new int[10];
+        countReversed = new int[10];
         for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
         return Arrays.toString(countReversed);
+    }
+
+    private int cCentralsOcupation() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALC && centralInUse(i))
+                ++count;
+        }
+        return count;
+    }
+
+    private int cCentrals() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALC)
+                ++count;
+        }
+        return count;
+    }
+
+    private int bCentralsOcupation() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALB && centralInUse(i))
+                ++count;
+        }
+        return count;
+    }
+
+    private int bCentrals() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALB)
+                ++count;
+        }
+        return count;
+    }
+
+    private int aCentralsOcupation() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALA && centralInUse(i))
+                ++count;
+        }
+        return count;
+    }
+
+    private int aCentrals() {
+        int count = 0;
+        for (int i = 0; i < getCentralsNumber(); ++i) {
+            if (getCentral(i).getTipo() == CENTRALA)
+                ++count;
+        }
+        return count;
     }
 
     // -------------------- Funcions redefinides auxiliars ---------------------
