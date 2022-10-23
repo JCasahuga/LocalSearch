@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Main {
 
     static private int[] numberOfCentrals = new int[]{5, 10, 25};           // Centrals type A, B, C (?)
-    static private int numberOfClients = 1000;                              // Number of clients
+    static private int numberOfClients = 500;                              // Number of clients
     static private double[] typeOfClients = new double[]{0.25, 0.3, 0.45};  // Client type XG, MG, G (?)
     static private double propGuaranteed = 0.75;                            // % of clients with guaranteed supply
     static private int algorithm = 0;                                       // (0) - Hill Climbling, (1) - Simulated Annealing
@@ -162,7 +162,7 @@ public class Main {
 		else if (heuristic == 1) System.out.println ("Solution using Hill Climbing + Custom: ");
 		else if (heuristic == 2) System.out.println ("Solution using Hill Climbing + Not Guarre: ");
 		try {
-			networkState.printState(false, 0, false, null, algorithm);
+			//networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
 			Problem problem;
@@ -188,7 +188,7 @@ public class Main {
 		if 		(heuristic == 0) System.out.println ("Solution using Simulated Annealing + Benefici: ");
 		else if (heuristic == 1) System.out.println ("Solution using Simulated Annealing + Custom: ");
 		try {
-			networkState.printState(false, 0, false, null, algorithm);
+			//networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
 			Problem problem;

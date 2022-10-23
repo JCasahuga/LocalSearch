@@ -394,12 +394,12 @@ public class ElectricalNetworkState {
 
         if (finalState) System.out.println ("Time to generate solution    " + time + " ms");
         System.out.println ("Solution benefit:            " + getBenefit());
-        System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
-        System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
-        System.out.println("A Centrals Used: " + aCentralsOcupation() + "/" + aCentrals());
-        System.out.println("B Centrals Used: " + bCentralsOcupation() + "/" + bCentrals());
-        System.out.println("C Centrals Used: " + cCentralsOcupation() + "/" + cCentrals());
         System.out.println ("Nombre de clients assignats  " + numberOfAssignedClients() + " / " + getClientsNumber());
+        System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
+        // System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
+        // System.out.println("A Centrals Used: " + aCentralsOcupation() + "/" + aCentrals());
+        // System.out.println("B Centrals Used: " + bCentralsOcupation() + "/" + bCentrals());
+        // System.out.println("C Centrals Used: " + cCentralsOcupation() + "/" + cCentrals());
         System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
     }
