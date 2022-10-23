@@ -34,11 +34,12 @@ public class ElectricalNetworkState {
     private int[] assignedClients; 
     private double[] leftPowerCentral;
     private double benefDynamic = 0;
-    private double assignedCDynamic = 0;
     private double distanceDynamic = 0;
     private double powerLeftDynamic = 0;
     private double guaranteedNotAssigned = 0;
     private double totalGuaranteed = 0;
+
+    Random rand = new Random();
 
     // ------------------------ Constructors -------------------------------
     public ElectricalNetworkState() {}
@@ -55,28 +56,14 @@ public class ElectricalNetworkState {
         assignedClients = Arrays.copyOf(networkState.getAssignedClients(), getClientsNumber());
         leftPowerCentral = Arrays.copyOf(networkState.getLeftPowerCentral(), getCentralsNumber());
         benefDynamic = networkState.getDynamicBenefit();
-        assignedCDynamic = networkState.getDynamicAssignedC();
         powerLeftDynamic = networkState.getDynamicPowerLeft();
         distanceDynamic = networkState.getDynamicDistance();
         guaranteedNotAssigned = networkState.getGuaranteedNotAssigned();
         totalGuaranteed = networkState.getTotalGuaranteed();
     }
 
-    // public ElectricalNetworkState(Clientes clnts, Centrales ctrls, int[] assigClt, double[] lfPwCtrl) {
-    //     clients = clnts;
-    //     centrals = ctrls;
-
-    //     assignedClients = assigClt;
-    //     leftPowerCentral = lfPwCtrl;
-    // }
-
-
-
-    public double getDynamicPowerLeft() {
-        return powerLeftDynamic;
-    }
-
     //  ---------------------- Initial states generation --------------
+    // Permet seleccionar quina generació de soluciona inicial s'utilitza
     public void generateInitialSolution(int method)
     {
         assignedClients = new int[clients.size()];
@@ -105,10 +92,10 @@ public class ElectricalNetworkState {
         }
         benefDynamic = getBenefit();
         distanceDynamic = getDistanceToCentrals();
-        assignedCDynamic = numberOfAssignedClients();
         powerLeftDynamic = getTotalLeftPowerCentral();
     }
 
+    // Generació de solució buida
     private void generateEmpty() {
         int tClients = getClientsNumber();
         int tCentrals = getCentralsNumber();
@@ -124,6 +111,7 @@ public class ElectricalNetworkState {
         System.out.println(totalGuaranteed);
     }
 
+    // Generació de solució per proximitat
     private void generateInitialSolutionClosestFull() {
         int tClients = getClientsNumber();
         int tCentrals = getCentralsNumber();
@@ -165,16 +153,14 @@ public class ElectricalNetworkState {
                 }
             }
             assignedClients[i] = closest;
-            if (closest != -1)  {
+            if (closest != -1)
                 leftPowerCentral[closest] -= minConsumption;
-            } else {
+            else
                 if (isGuaranteed(i)) ++guaranteedNotAssigned;
-            }
-            //System.out.println("Assigned client " + i + " to central " + closest);
         }
     }
 
-
+    // Generació de solució totalment aleatoria només garantits
     private void generateInitialSolutionRandomGuaranteed(int maxTotal) {
         int tClients = getClientsNumber();
         int tCentrals = getCentralsNumber();
@@ -238,11 +224,10 @@ public class ElectricalNetworkState {
             }
 
             Collections.shuffle(intList);
-            //System.out.println("Assigned client " + i + " to central " + closest);
         }
     }
 
-
+    // Generació de solució totalment aleatoria
     private void generateInitialSolutionRandom(int maxTotal) {
         int tClients = getClientsNumber();
         int tCentrals = getCentralsNumber();
@@ -315,10 +300,10 @@ public class ElectricalNetworkState {
             }
 
             Collections.shuffle(intList);
-            //System.out.println("Assigned client " + i + " to central " + closest);
         }
     }
 
+    // Retorna el percentatge de compensació
     private double powerLossCompensation(double d) {
         if (d <= 10) return 1;
         if (d <= 25) return 1 / 0.9;
@@ -327,52 +312,46 @@ public class ElectricalNetworkState {
         return 1 / 0.4;
     }
 
+    // Retorna la distancia per punt1 i punt2
     private double getDistance(int x1, int y1, int x2, int y2) {
         int distX = x1 - x2;
         int distY = y1 - y2;
         return Math.sqrt(distX*distX + distY*distY);
     }
 
-    private double getDistancePow(int x1, int y1, int x2, int y2) {
-        int distX = x1 - x2;
-        int distY = y1 - y2;
-        return distX*distX + distY*distY;
-    }
-    
-    private double getDistancePow(int cl, int ce) {
-        return getDistancePow(getClient(cl), getCentral(ce));
-    }
-
+    // Retorna la distancia per cl i ce
     private double getDistance(int cl, int ce) {
         if (ce == -1) return 150;
         return getDistance(getClient(cl), getCentral(ce));
     }
 
+    // Retorna la distancia per cl i ce
     private double getDistance(Cliente cl, Central ce) {
         return getDistance(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
     }
 
-    private double getDistancePow(Cliente cl, Central ce) {
-        return getDistancePow(cl.getCoordX(), cl.getCoordY(), ce.getCoordX(), ce.getCoordY());
-    }
-
     // ------------------------ Funcions auxiliars ---------------------
+    // Retornen els clients
     public Clientes getClients(){
         return clients;
     }
 
+    // Retorna les centrals
     public Centrales getCentrals(){
         return centrals;
     }
 
+    // Retorna l'assignació de cada client
     public int[] getAssignedClients(){
         return assignedClients;
     }
 
+    // Retorna l'array dels valors d'energia restant de cada central
     public double[] getLeftPowerCentral(){
         return leftPowerCentral;
     }
 
+    // Retorna l'energia restant total
     public double getTotalLeftPowerCentral(){
         double c = 0;
         for (int i = 0; i < getCentralsNumber(); ++i) {
@@ -382,6 +361,7 @@ public class ElectricalNetworkState {
         return c;
     }
 
+    // Fa print de l'estat inicial i final
     public void printState(boolean finalState, double time, boolean printSteps, SearchAgent agent, int algorithm)
     {
         if (!finalState)System.out.println ("------- Starting generated solution: "); 
@@ -395,15 +375,13 @@ public class ElectricalNetworkState {
         if (finalState) System.out.println ("Time to generate solution    " + time + " ms");
         System.out.println ("Solution benefit:            " + getBenefit());
         System.out.println ("Nombre de clients assignats  " + numberOfAssignedClients() + " / " + getClientsNumber());
+        getOccupationDistribution();
         System.out.println ("Average distance to central: " + getAverageDistanceToCentrals());
-        // System.out.println ("Central ocupation distr.:    " + getOccupationDistribution() + " out of " + getCentralsNumber());
-        // System.out.println("A Centrals Used: " + aCentralsOcupation() + "/" + aCentrals());
-        // System.out.println("B Centrals Used: " + bCentralsOcupation() + "/" + bCentrals());
-        // System.out.println("C Centrals Used: " + cCentralsOcupation() + "/" + cCentrals());
         System.out.println ("Valid state:                 " + isValidState());
         System.out.println();
     }
 
+    // Fa print de les accions per arribar aquella solució, activat només per HC
     private static void printActions(List actions) {
         for (int i = 0; i < actions.size(); i++) {
             String action = (String) actions.get(i);
@@ -411,6 +389,7 @@ public class ElectricalNetworkState {
         }
     }
 
+    // Fa print dels parametres d'execucio
     private static void printInstrumentation(Properties properties) {
         var keys = properties.keySet().iterator();
         while (keys.hasNext()) {
@@ -420,6 +399,7 @@ public class ElectricalNetworkState {
         }
     }
 
+    // Retorna la distancia mitjana entre clients i centrals
     public double getAverageDistanceToCentrals() {
         double sum = 0, count = 0;
         for (int i = 0; i < getClientsNumber(); ++i) {
@@ -432,6 +412,7 @@ public class ElectricalNetworkState {
         return sum/count;
     }
 
+    // Retorna distancia entre clients i centrals
     public double getDistanceToCentrals() {
         double sum = 0, count = 0;
         for (int i = 0; i < getClientsNumber(); ++i) {
@@ -446,43 +427,20 @@ public class ElectricalNetworkState {
         return sum;
     }
 
-    public double getPowAverageDistanceToCentrals() {
-        double sum = 0, count = 0;
-        for (int i = 0; i < getClientsNumber(); ++i) {
-            if (assignedClients[i] != -1) {
-                sum += getDistancePow(i, assignedClients[i]);
-                ++count;
-            }
-        }
-        return sum/count;
-    }
-
-
-    public int numberOfAssignedClients() {
-        int count = 0;
-        for (int i : assignedClients) if (i != -1) ++count;
-        return count;
-    }
-
     /** 
-        Returns a string in array looking format with 10 values each of them indicate the
-        number of centrals within a range consumption usage. 
-        F.e. 3rd value will indicate the number of centrals that are being used between 
-        30% and 40% of its capacity
+        Imprimeix la distribució de cada un dels tipus de centrals per indicar el numero de
+        centrals que es troben dins del rang de consum.
+        Per exempl: El tercer valor indica que aquell numero centrals s'estan utilitzan entre el 30% i 40% de la seva capacitat
     */
     private String getOccupationDistribution() {
-        //String[] occupation = new String[10];
         int[] count = new int[10];
         int t = 0;
         double total = 0;
-        //System.err.println("Getting occupation dist:");
         for (int i = 0; i < getCentralsNumber(); ++i) {
             if (getCentral(i).getTipo() == CENTRALB) {
                 double production = getCentral(i).getProduccion();
-                //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
                 int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
                 total += (production-leftPowerCentral[i])/production;
-                //System.err.println(index);
                 count[index]++;
                 ++t;
             }
@@ -491,16 +449,14 @@ public class ElectricalNetworkState {
         total /= t;
         int[] countReversed = new int[10];
         for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
-        System.out.println("Centrals A " + Arrays.toString(countReversed) + " " + total);
+        System.out.println("Centrals A " + Arrays.toString(countReversed) + " " + Math.round(total));
         count = new int[10];
         total = 0;
         t = 0;
         for (int i = 0; i < getCentralsNumber(); ++i) {
             if (getCentral(i).getTipo() == CENTRALB) {
                 double production = getCentral(i).getProduccion();
-                //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
                 int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
-                //System.err.println(index);
                 count[index]++;
                 total += (production-leftPowerCentral[i])/production;
                 ++t;
@@ -510,16 +466,14 @@ public class ElectricalNetworkState {
         total /= t;
         countReversed = new int[10];
         for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
-        System.out.println("Centrals B " + Arrays.toString(countReversed) + " " + total);
+        System.out.println("Centrals B " + Arrays.toString(countReversed) + " " + Math.round(total));
         count = new int[10];
         total = 0;
         t = 0;
         for (int i = 0; i < getCentralsNumber(); ++i) {
             if (getCentral(i).getTipo() == CENTRALC) {
                 double production = getCentral(i).getProduccion();
-                //System.err.print(leftPowerCentral[i] + " - " + production + " -> index: ");
                 int index = Math.max((int)((leftPowerCentral[i]/production)*10)-1, 0);
-                //System.err.println(index);
                 count[index]++;
                 total += (production-leftPowerCentral[i])/production;
                 ++t;
@@ -531,82 +485,30 @@ public class ElectricalNetworkState {
 
         countReversed = new int[10];
         for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
-        System.out.println("Centrals C " + Arrays.toString(countReversed) + " " + total);
-        // for (int i = 0; i < 10; ++i) {
-        //     occupation[i] = String.valueOf((double)count[i]/(double)getCentralsNumber());
-        //     //System.err.println(occupation[i] + " - " + count[i]);
-        // }
+        System.out.println("Centrals C " + Arrays.toString(countReversed) + " " + Math.round(total));
         countReversed = new int[10];
         for (int i = 0; i <= 9; ++i) countReversed[i] = count[9-i];
         return Arrays.toString(countReversed);
     }
 
-    private int cCentralsOcupation() {
+    // Retorna el numero de clients assignats
+    public int numberOfAssignedClients() {
         int count = 0;
-        for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (getCentral(i).getTipo() == CENTRALC && centralInUse(i))
-                ++count;
-        }
+        for (int i : assignedClients) if (i != -1) ++count;
         return count;
     }
 
-    private int cCentrals() {
-        int count = 0;
-        for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (getCentral(i).getTipo() == CENTRALC)
-                ++count;
-        }
-        return count;
-    }
-
-    private int bCentralsOcupation() {
-        int count = 0;
-        for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (getCentral(i).getTipo() == CENTRALB && centralInUse(i))
-                ++count;
-        }
-        return count;
-    }
-
-    private int bCentrals() {
-        int count = 0;
-        for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (getCentral(i).getTipo() == CENTRALB)
-                ++count;
-        }
-        return count;
-    }
-
-    private int aCentralsOcupation() {
-        int count = 0;
-        for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (getCentral(i).getTipo() == CENTRALA && centralInUse(i))
-                ++count;
-        }
-        return count;
-    }
-
-    private int aCentrals() {
-        int count = 0;
-        for (int i = 0; i < getCentralsNumber(); ++i) {
-            if (getCentral(i).getTipo() == CENTRALA)
-                ++count;
-        }
-        return count;
-    }
-
-    // -------------------- Funcions redefinides auxiliars ---------------------
-
+    // Retorna el numero de clients
     public int getClientsNumber() {
         return clients.size();
     }
 
+    // Retorna el numero de centrals
     public int getCentralsNumber() {
         return centrals.size();
     }
 
-    Random rand = new Random();
-    /** Returns the benefit of the current state. Use getDynamicBenefit if possible. */
+    // Retorna el benefici d'un estat, utilitzar benefici dynamic preferentment
     public double getBenefit(){
         double benef = 0, costc = 0;
         for(int i = 0; i < leftPowerCentral.length; ++i){
@@ -618,27 +520,32 @@ public class ElectricalNetworkState {
         return benef-costc;
     }
 
+    // Retorna el numero de clients garantits
     public double getTotalGuaranteed() {
         return totalGuaranteed;
     }
 
-    /** Returns the current state's benefit (it is autoupdated on each "move") */
+    // Retorna l'energiaDynamica
+    public double getDynamicPowerLeft() {
+        return powerLeftDynamic;
+    }
+    
+    // Retorna el beneficiDynamic
     public double getDynamicBenefit() {
         return benefDynamic;
     }
-
-    public double getDynamicAssignedC() {
-        return assignedCDynamic;
-    }
-
+    
+    // Retorna el numero de clients garantitzats no assignats
     public double getGuaranteedNotAssigned() {
         return guaranteedNotAssigned;
     }
 
+    // Retorna la dynamicDistance
     public double getDynamicDistance() {
         return distanceDynamic;
     }
 
+    // Retorna el cost de la central i
     private double costCentral(int central){
         Central c = getCentral(central);
         double consumcentral = c.getProduccion();
@@ -657,6 +564,7 @@ public class ElectricalNetworkState {
         return 0;
     }
 
+    // Retorna el benefici del client i
     private double beneficiClient(int client){
         Cliente c = getClient(client);
         double consumClient = c.getConsumo();
@@ -689,41 +597,47 @@ public class ElectricalNetworkState {
         return 0;
     }
 
+    // Retorna l'objecte del client i
     private Cliente getClient(int client) {
         return clients.get(client);
     }
 
+    // Retorna l'objecte de la central i
     private Central getCentral(int central) {
         return centrals.get(central);
     }
 
+    // Retorna el tipus de contracte del client
     private int getContract(int client) {
         return getClient(client).getContrato();
     }
 
+    // Retorna cert si el client és garantit
     private boolean isGuaranteed(int client) {
         return getContract(client) == GARANTIZADO;
     }
 
+    // Retorna cert si la central té un client assignat
     public boolean centralInUse(int central) {
-        //System.err.println("Produccio " + getCentral(central).getProduccion() + " power left " + leftPowerCentral[central] + " -- " + (getCentral(central).getProduccion() == leftPowerCentral[central]));
         return getCentral(central).getProduccion() != leftPowerCentral[central];
     }
 
-    // Returns the real consumption of a client given a central
+    // Retorna l'energia que consumeix segons la compensació de distancia
     private double getRealConsumption(Cliente client, Central central) {
-        return getRealConsumtion(getDistance(client, central), client.getConsumo());
+        return getRealConsumption(getDistance(client, central), client.getConsumo());
     }
 
+    // Retorna l'energia que consumeix segons la compensació de distancia
     private double getRealConsumption(int client, int central) {
         return getRealConsumption(getClient(client), getCentral(central));
     }
 
-    // Distance in km and consum
-    private double getRealConsumtion(double distance, double consumption) {
+    // Retorna l'energia que consumeix segons la compensació de distancia
+    private double getRealConsumption(double distance, double consumption) {
         return consumption * powerLossCompensation(distance);
     }
 
+    // Retorna cert si totes les centrals tenen energia restant >= 0 i els clients garantitzats estan assignats
     private boolean isValidState() {
         for (int i = 0; i < getClientsNumber(); ++i) {
             if (isGuaranteed(i) && assignedClients[i] == -1) {
@@ -740,54 +654,7 @@ public class ElectricalNetworkState {
         return true;
     }
 
-    public int numberOfXGClients() {
-        int count = 0;
-        for (Cliente c : clients) {
-            if (c.getTipo() == CLIENTEXG) ++count;
-        }
-        return count;
-    }
-
-    public int numberOfXGClientsUsed() {
-        int count = 0;
-        for (int i = 0; i < getClientsNumber(); ++i) {
-            if (clients.get(i).getTipo() == CLIENTEXG && assignedClients[i] != -1) ++count;
-        }
-        return count;
-    }
-
-    public int numberOfMGClients() {
-        int count = 0;
-        for (Cliente c : clients) {
-            if (c.getTipo() == CLIENTEMG) ++count;
-        }
-        return count;
-    }
-
-    public int numberOfMGlientsUsed() {
-        int count = 0;
-        for (int i = 0; i < getClientsNumber(); ++i) {
-            if (clients.get(i).getTipo() == CLIENTEMG && assignedClients[i] != -1) ++count;
-        }
-        return count;
-    }
-
-    public int numberOfGClients() {
-        int count = 0;
-        for (Cliente c : clients) {
-            if (c.getTipo() == CLIENTEG) ++count;
-        }
-        return count;
-    }
-
-    public int numberOfGClientsUsed() {
-        int count = 0;
-        for (int i = 0; i < getClientsNumber(); ++i) {
-            if (clients.get(i).getTipo() == CLIENTEG && assignedClients[i] != -1) ++count;
-        }
-        return count;
-    }
-
+    // Retorna el numero de centrals tipo A utilitzades
     public int numberOfACentralsUsed() {
         int count = 0;
         for (int i = 0; i < getCentralsNumber(); ++i) {
@@ -796,6 +663,7 @@ public class ElectricalNetworkState {
         return count;
     }
 
+    // Retorna el numero de centrals tipo B utilitzades
     public int numberOfBCentralsUsed() {
         int count = 0;
         for (int i = 0; i < getCentralsNumber(); ++i) {
@@ -804,6 +672,7 @@ public class ElectricalNetworkState {
         return count;
     }
 
+    // Retorna el numero de centrals tipo C utilitzades
     public int numberOfCCentralsUsed() {
         int count = 0;
         for (int i = 0; i < getCentralsNumber(); ++i) {
@@ -811,7 +680,8 @@ public class ElectricalNetworkState {
         }
         return count;
     }
-
+    
+    // Verifica si l'operació de mou es possible
     public boolean canMove(int client, int central)
     {
         if (assignedClients[client] == central) return false;
@@ -820,6 +690,7 @@ public class ElectricalNetworkState {
         return true;
     }
 
+    // Verifica si l'operació de swap es possible
     public boolean canSwap(int client1, int central1, int client2, int central2) {
         if (central1 == central2) return false;
         if (central1 == -1 && isGuaranteed(client2)) return false;
@@ -835,6 +706,7 @@ public class ElectricalNetworkState {
             && getRealConsumption(client2, central1) <= leftPowerCentral[central1] + getRealConsumption(client1, central1);
     }
 
+    // Actualitza l'energia restant a la central amb els nous valors de consum
     private void updateLeftPower(int central, double oldclientcons, double nouclientcons){
         boolean wasInUse = centralInUse(central); 
         powerLeftDynamic -= leftPowerCentral[central];
@@ -843,9 +715,8 @@ public class ElectricalNetworkState {
         if (!centralInUse(central) && wasInUse) powerLeftDynamic -= getCentral(central).getProduccion();
     }
 
-    ///////////////////////////////////////////////////////
+    // Mou el client a la central
     public boolean mouClient(int client, int central) {
-        //System.err.println("Moving " + client + " to central " + central);
             int orCentral = assignedClients[client];
             double orClient = beneficiClient(client);
 
@@ -862,24 +733,21 @@ public class ElectricalNetworkState {
             benefDynamic += beneficiClient(client);
 
             if (isGuaranteed(client)) {
-                if (orCentral == -1 && central != -1) {
+                if (orCentral == -1 && central != -1)
                     --guaranteedNotAssigned;
-                }
-                if (orCentral != -1 && central == -1) {
+                if (orCentral != -1 && central == -1)
                     ++guaranteedNotAssigned;
-                } 
             }
-
-            if (central != -1 && orCentral == -1) ++assignedCDynamic;
-            if (central == -1 && orCentral != -1) --assignedCDynamic;
 
             return true;
     }
     
+    // Retorna la central en que el client c esta assignat
     public int getCentralAssignedToClient(int c) {
         return assignedClients[c];
     }
 
+    // Caniva l'assignació del client1 al client 2
     public boolean swapClient(int client1, int client2){
         int central1 = assignedClients[client1], central2 = assignedClients[client2];
             double oldC1 = beneficiClient(client1);
@@ -926,13 +794,13 @@ public class ElectricalNetworkState {
             return true;
     }
 
+    // Treu tots els clients que estiguin assignats a la central
     public boolean resetCentral(int central){
         for (int i = 0; i < getClientsNumber(); ++i) {
             if (assignedClients[i] == central) {
                 benefDynamic -= beneficiClient(i);
                 assignedClients[i] = -1;
                 benefDynamic += beneficiClient(i);
-                --assignedCDynamic;
                 powerLeftDynamic -= leftPowerCentral[central];
                 distanceDynamic -= getDistance(i, central);
                 distanceDynamic += getDistance(i, -1);

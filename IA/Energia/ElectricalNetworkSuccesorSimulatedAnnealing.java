@@ -39,7 +39,6 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
             while (!actionDone) {
                 for (int j = 0; j < saDepth; ++j) {
                     int k = getRandomStep(totalCases);
-                    //System.err.println("k is " + k);
                     switch (k) {
                     // Move Client
                     case 0:
@@ -48,7 +47,6 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
                             actionDone = actionDone || nextState.mouClient(client, central);
                             action = "Moved client " + client + " to central " + central;
                         }
-                        //System.err.println(action);
                         break;
                     // Switch Client
                     case 1:
@@ -58,14 +56,12 @@ public class ElectricalNetworkSuccesorSimulatedAnnealing implements SuccessorFun
                             actionDone = actionDone || nextState.swapClient(client1, client2);
                             action = "Swaped client " + client1 + " for " + client2;
                         }
-                        //System.err.println(action);
                         break;
                     // Reset Central
                     case 2:
                         int centralRemoved = rand.nextInt(centralsNumber);
                         actionDone = actionDone || nextState.resetCentral(centralRemoved);
                         action = "Eliminat clients central" + centralRemoved;
-                        //System.err.println(action);
                         retval.add(new Successor(action, nextState));
                         break;
                     // Default

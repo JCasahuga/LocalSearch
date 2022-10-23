@@ -5,11 +5,9 @@ import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
-import aima.search.informed.IterativeDeepeningAStarSearch;
 
 import java.util.Arrays;
 import java.util.Scanner;
-
 
 public class Main {
 
@@ -42,7 +40,6 @@ public class Main {
     			case "run":
                     Centrales centrals = new Centrales(numberOfCentrals, seed);
                     Clientes clients = new Clientes(numberOfClients, typeOfClients, propGuaranteed, seed);
-                    // TODO: Executar segons params
 					ElectricalNetworkState networkState  = new ElectricalNetworkState(clients, centrals);
 					networkState.generateInitialSolution(generationMethod);
 					networkState.heuristic = heuristic;
@@ -104,6 +101,7 @@ public class Main {
         }
     }
 
+	// Imprimeix els parametres actuals
     private static void printOptions() {
         System.out.println("Current Values: ");
 		System.out.println("================");
@@ -116,7 +114,8 @@ public class Main {
         else                     System.out.println("ERROR: No search algorithm");
 		
 		if      (heuristic == 0) System.out.println("heuristica: Benefit");
-		else if (heuristic == 1) System.out.println("heuristica: Custom");
+		else if (heuristic == 1) System.out.println("heuristica: DistanciaEnergia");
+		else if (heuristic == 2) System.out.println("heuristica: DistanciaEnergiaPenalització");
         else                     System.out.println("ERROR: No heuristic");
 		
 		if      (generationMethod == 0) System.out.println("Generation method: [0] Everyone to closest");
@@ -124,12 +123,14 @@ public class Main {
 		else if (generationMethod == 2) System.out.println("Generation method: [2] Random amb garantits (centrals/2)");
 		else if (generationMethod == 3) System.out.println("Generation method: [3] Random (1)");
 		else if (generationMethod == 4) System.out.println("Generation method: [4] Random (centrals/2)");
+		else if (generationMethod == 5) System.out.println("Generation method: [5] Empty");
         else                     System.out.println("ERROR: No generation method");
 		
 		System.out.println("Seed: " + seed);
         System.out.println("================");
 	}
     
+	// Imprimeix els commands
     private static void printCommands() {
         System.out.println ("Commands: ");
         System.out.println ("================");
@@ -139,8 +140,10 @@ public class Main {
         System.out.println ("typeclient <XG> <MG> <G> -- change client types");
         System.out.println ("gclient <N>              -- change % of clients with guaranteed supply ");
 		System.out.println ("algo <I>                 -- change search algorithm ([0]- Hill climbing, [1]- Simulated annealing)");
-		System.out.println ("genmethod <I>            -- change generation method ([0]- Closest, [1]- )");
-		System.out.println ("heur <I>                 -- change heuristic ([0]- Benefici, [1]- Custom)");
+		System.out.println ("genmethod <I>            -- change generation method ([0]- Closest, [1]- Random amb garantits (1), ");
+		System.out.println ("                                                     [2] Random amb garantits (centrals/2), [3]");
+		System.out.println ("                                                     Random (1), [4] Random (centrals/2),  [5] Empty)");
+		System.out.println ("heur <I>                 -- change heuristic ([0]- Benefici, [1]- DistanciaEnergia, [2]- DistanciaBeneficiPenalitzacio)");
 		System.out.println ("seed <I>                 -- change the seed");
 		System.out.println ("print                    -- see current values");
 		System.out.println ("cmds                     -- see commands");
@@ -159,10 +162,9 @@ public class Main {
 
 	private static boolean ElectricalNetwork_HillClimbing(ElectricalNetworkState networkState) {
         if 		(heuristic == 0) System.out.println ("Solution using Hill Climbing + Benefici: ");
-		else if (heuristic == 1) System.out.println ("Solution using Hill Climbing + Custom: ");
-		else if (heuristic == 2) System.out.println ("Solution using Hill Climbing + Not Guarre: ");
+		else if (heuristic == 1) System.out.println ("Solution using Hill Climbing + DistanciaEnergia: ");
+		else if (heuristic == 2) System.out.println ("Solution using Hill Climbing + DistanciaEnergiaPenalitzacio: ");
 		try {
-			//networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
 			Problem problem;
@@ -186,9 +188,9 @@ public class Main {
 
     private static boolean ElectricalNetwork_SimulatedAnnealing(ElectricalNetworkState networkState) {
 		if 		(heuristic == 0) System.out.println ("Solution using Simulated Annealing + Benefici: ");
-		else if (heuristic == 1) System.out.println ("Solution using Simulated Annealing + Custom: ");
+		else if (heuristic == 1) System.out.println ("Solution using Simulated Annealing + DistanciaEnergia: ");
+		else if (heuristic == 2) System.out.println ("Solution using Simulated Annealing + DistanciaEnergiaPenalitzacio: ");
 		try {
-			//networkState.printState(false, 0, false, null, algorithm);
 			long time = System.currentTimeMillis();
 			
 			Problem problem;
