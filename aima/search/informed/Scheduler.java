@@ -21,6 +21,9 @@ public class Scheduler {
     }
     
     public Scheduler() {
+        // this.k = 20;
+        // this.lam = 0.05;
+        // this.limit = 100;
         this.k = 20;
         this.lam = 0.005;
         this.limit = 100;
